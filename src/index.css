@@ -25,3 +25,7 @@ body {
 .active-nav-link svg { 
     @apply text-emerald-600;
 }
+
+#sidebar {
+    width: auto;
+}

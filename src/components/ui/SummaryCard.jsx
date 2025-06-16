@@ -19,11 +19,11 @@ const SummaryCard = ({ icon, title, value, description, color, progress }) => {
 
     return (
         <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300">
-            <div className="flex items-center justify-between mb-3">
+            <div className={`flex items-center justify-center p-2.5 mb-1 ${classes.bg} rounded-lg`}>
+                {React.cloneElement(icon, { className: `${classes.icon} w-6 h-6` })}
+            </div>
+            <div className="flex items-center justify-center  mb-3">
                 <h3 className="text-lg font-medium text-stone-600">{title}</h3>
-                <div className={`p-2.5 ${classes.bg} rounded-lg`}>
-                    {React.cloneElement(icon, { className: `${classes.icon} w-6 h-6` })}
-                </div>
             </div>
             <p className={`text-3xl font-bold ${classes.text}`}>{value}</p>
             <p className="text-sm text-stone-500">{description}</p>

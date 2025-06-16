@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { PlusCircle, PlayCircle, Loader2, XCircle } from 'lucide-react';
-
 import RepoInputGroup from '../components/input/RepoInputGroup';
+
+import { analyzeRepositories } from '../services/AnalysisService';
+
 
 export default function AnalyzeView() {
     const [startDate, setStartDate] = useState('');
@@ -26,7 +28,7 @@ export default function AnalyzeView() {
         setRepositories(updated);
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         setError('');
         setShowResults(false);
@@ -37,10 +39,22 @@ export default function AnalyzeView() {
         }
 
         setLoading(true);
-        setTimeout(() => {
-            setLoading(false);
+
+        const payload = {
+            startDate,
+            endDate,
+            projectLink,
+            repositories,
+        };
+
+        try {
+            const response = await analyzeRepositories(payload);
             setShowResults(true);
-        }, 2000);
+        } catch (err) {
+            setError(err.message || 'Erro ao analisar repositórios.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
