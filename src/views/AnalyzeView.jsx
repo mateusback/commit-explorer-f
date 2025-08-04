@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
-import { PlusCircle, PlayCircle, Loader2, XCircle } from 'lucide-react';
+import { PlusCircle, PlayCircle, Loader2 } from 'lucide-react';
 import RepoInputGroup from '../components/input/RepoInputGroup';
-
-import { analyzeRepositories } from '../services/AnalysisService';
-
+import { analyzeRepositories } from '../services/analysisService';
+import { NotificationService } from '../services/NotificationService';
 
 export default function AnalyzeView() {
     const [startDate, setStartDate] = useState('');
@@ -11,7 +10,6 @@ export default function AnalyzeView() {
     const [projectLink, setProjectLink] = useState('');
     const [repositories, setRepositories] = useState([{ url: '', branch: 'main' }]);
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState('');
     const [showResults, setShowResults] = useState(false);
 
     const addRepository = () => {
@@ -30,11 +28,10 @@ export default function AnalyzeView() {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        setError('');
         setShowResults(false);
 
         if (!repositories.length || repositories.some(r => !r.url)) {
-            setError('Por favor, adicione pelo menos um repositório válido.');
+            NotificationService.error('Por favor, adicione pelo menos um repositório válido.');
             return;
         }
 
@@ -48,10 +45,11 @@ export default function AnalyzeView() {
         };
 
         try {
-            const response = await analyzeRepositories(payload);
+            await analyzeRepositories(payload);
             setShowResults(true);
+            NotificationService.success('Análise iniciada com sucesso!');
         } catch (err) {
-            setError(err.message || 'Erro ao analisar repositórios.');
+            NotificationService.error(err.message || 'Erro ao analisar repositórios.');
         } finally {
             setLoading(false);
         }
@@ -66,17 +64,21 @@ export default function AnalyzeView() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
                         <label className="block text-sm font-medium text-stone-600 mb-1">Data de Início</label>
-                        <input type="date" className="w-full p-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500" value={startDate} onChange={e => setStartDate(e.target.value)} />
+                        <input type="date" className="w-full p-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                            value={startDate} onChange={e => setStartDate(e.target.value)} />
                     </div>
                     <div>
                         <label className="block text-sm font-medium text-stone-600 mb-1">Data de Fim</label>
-                        <input type="date" className="w-full p-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500" value={endDate} onChange={e => setEndDate(e.target.value)} />
+                        <input type="date" className="w-full p-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                            value={endDate} onChange={e => setEndDate(e.target.value)} />
                     </div>
                 </div>
 
                 <div className="mb-8">
                     <label className="block text-sm font-medium text-stone-600 mb-1">Link do Projeto Principal no GitHub</label>
-                    <input type="url" placeholder="https://github.com/usuario/projeto" className="w-full p-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500" value={projectLink} onChange={e => setProjectLink(e.target.value)} />
+                    <input type="url" placeholder="https://github.com/usuario/projeto"
+                        className="w-full p-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                        value={projectLink} onChange={e => setProjectLink(e.target.value)} />
                     <p className="text-xs text-stone-400 mt-1">Este link é usado para acessar as Issues, Pull Requests, etc.</p>
                 </div>
 
@@ -94,13 +96,15 @@ export default function AnalyzeView() {
                     ))}
                 </div>
 
-                <button type="button" onClick={addRepository} className="mt-4 flex items-center space-x-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
+                <button type="button" onClick={addRepository}
+                    className="mt-4 flex items-center space-x-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700">
                     <PlusCircle className="w-4 h-4" />
                     <span>Adicionar outro repositório</span>
                 </button>
 
                 <div className="mt-8 border-t pt-6 flex justify-end">
-                    <button type="submit" className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-8 rounded-lg shadow hover:shadow-md transition-all duration-150 flex items-center space-x-2">
+                    <button type="submit"
+                        className="bg-emerald-500 hover:bg-emerald-600 text-white font-semibold py-3 px-8 rounded-lg shadow hover:shadow-md transition-all duration-150 flex items-center space-x-2">
                         {loading ? (
                             <>
                                 <Loader2 className="w-5 h-5 animate-spin" />
@@ -115,12 +119,6 @@ export default function AnalyzeView() {
                     </button>
                 </div>
             </form>
-
-            {error && (
-                <div className="mt-6 p-4 bg-red-100 text-red-700 border border-red-300 rounded-lg">
-                    <strong>Erro:</strong> {error}
-                </div>
-            )}
 
             {showResults && (
                 <div className="mt-8 p-4 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg analysis-placeholder">
