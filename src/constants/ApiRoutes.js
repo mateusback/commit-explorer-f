@@ -1,5 +1,7 @@
+const gitRoute = '/api/v1/git';
+
 const APIRoutes = {
-  ANALYZE_REPOSITORIES: '/api/analyze',
+  ANALYZE_REPOSITORIES: `${gitRoute}/analyze`,
 };
 
 export default APIRoutes;

@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 
-import './App.css';
 import Sidebar from './components/layout/Sidebar';
 import Header from './components/layout/Header';
 
@@ -12,62 +12,57 @@ import MetricsView from './views/MetricsView';
 import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
 
+const pageInfo = {
+    '/dashboard': {
+        title: 'Visão Geral dos Projetos',
+        subtitle: 'Insights agregados de todos os repositórios dos alunos.',
+    },
+    '/analyze': {
+        title: 'Analisar Repositórios GitHub',
+        subtitle: 'Envie uma URL de repositório para obter sua análise de qualidade e atividade.',
+    },
+    '/projects': {
+        title: 'Gerenciar Projetos dos Alunos',
+        subtitle: 'Navegue e selecione projetos individuais para análise detalhada.',
+    },
+    '/commits': {
+        title: 'Registro de Todos os Commits',
+        subtitle: 'Uma lista cronológica de todos os commits de todos os projetos.',
+    },
+    '/metrics': {
+        title: 'Análise de Métricas Globais',
+        subtitle: 'Detalhamento das métricas agregadas de todos os projetos.',
+    },
+    '/suggestions': {
+        title: 'Feed de Sugestões Globais',
+        subtitle: 'Uma lista abrangente de todas as sugestões.',
+    },
+    '/settings': {
+        title: 'Configurações da Aplicação',
+        subtitle: 'Configure o Commit Explorer, integrações e preferências.',
+    },
+};
+
 export default function App() {
-    const [view, setView] = useState('dashboard');
-
-    useEffect(() => {
-        const handleHashChange = () => {
-            const hash = window.location.hash.replace('#', '');
-            if (hash) {
-                setView(hash);
-            }
-        };
-        handleHashChange();
-        window.addEventListener('hashchange', handleHashChange);
-        return () => {
-            window.removeEventListener('hashchange', handleHashChange);
-        };
-    }, []);
-
-    const pageInfo = {
-        'dashboard': { title: 'Visão Geral dos Projetos', subtitle: 'Insights agregados de todos os repositórios dos alunos.' },
-        'analyze': { title: 'Analisar Repositórios GitHub', subtitle: 'Envie uma URL de repositório para obter sua análise de qualidade e atividade.' },
-        'projects': { title: 'Gerenciar Projetos dos Alunos', subtitle: 'Navegue e selecione projetos individuais para análise detalhada.' },
-        'commits': { title: 'Registro de Todos os Commits', subtitle: 'Uma lista cronológica de todos os commits de todos os projetos.' },
-        'metrics': { title: 'Análise de Métricas Globais', subtitle: 'Detalhamento das métricas agregadas de todos os projetos.' },
-        'suggestions': { title: 'Feed de Sugestões Globais', subtitle: 'Uma lista abrangente de todas as sugestões.' },
-        'settings': { title: 'Configurações da Aplicação', subtitle: 'Configure o Commit Explorer, integrações e preferências.' }
-    };
-
-    const currentInfo = pageInfo[view] || pageInfo.dashboard;
-
-    const renderView = () => {
-        switch (view) {
-            case 'dashboard':
-                return <DashboardView />;
-            case 'analyze':
-                return <AnalyzeView />;
-            case 'projects':
-                return <ProjectsView />;
-            case 'commits':
-                return <CommitsView />;
-            case 'metrics':
-                return <MetricsView />;
-            case 'suggestions':
-                return <SuggestionsView />;
-            case 'settings':
-                return <SettingsView />;
-            default:
-                return <DashboardView />;
-        }
-    };
+    const location = useLocation();
+    const info = pageInfo[location.pathname] || pageInfo['/dashboard'];
 
     return (
         <div className="flex h-screen overflow-hidden bg-stone-50 text-stone-700">
-            <Sidebar currentView={view} setView={setView} />
+            <Sidebar currentPath={location.pathname} />
             <main className="flex-1 p-6 md:p-8 lg:p-10 overflow-y-auto bg-stone-50">
-                <Header title={currentInfo.title} subtitle={currentInfo.subtitle} />
-                {renderView()}
+                <Header title={info.title} subtitle={info.subtitle} />
+                <Routes>
+                    <Route path="/" element={<Navigate to="/dashboard" />} />
+                    <Route path="/dashboard" element={<DashboardView />} />
+                    <Route path="/analyze" element={<AnalyzeView />} />
+                    <Route path="/projects" element={<ProjectsView />} />
+                    <Route path="/commits" element={<CommitsView />} />
+                    <Route path="/metrics" element={<MetricsView />} />
+                    <Route path="/suggestions" element={<SuggestionsView />} />
+                    <Route path="/settings" element={<SettingsView />} />
+                    <Route path="*" element={<Navigate to="/dashboard" />} />
+                </Routes>
                 <footer className="mt-8 text-center text-sm text-stone-400 print:hidden">
                     Commit Explorer &copy; 2024
                 </footer>

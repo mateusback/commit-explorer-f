@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
   SearchCode,
@@ -13,28 +14,23 @@ import {
   X
 } from 'lucide-react';
 
-const Sidebar = ({ currentView, setView }) => {
+const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const location = useLocation();
 
   const navItems = [
-    { id: 'dashboard', label: 'Visão Geral', icon: <LayoutDashboard /> },
-    { id: 'analyze', label: 'Analisar Repositório', icon: <SearchCode /> },
-    { id: 'projects', label: 'Projetos', icon: <FolderGit2 /> },
-    { id: 'commits', label: 'Todos os Commits', icon: <GitCommit /> },
-    { id: 'metrics', label: 'Métricas Globais', icon: <BarChart3 /> },
-    { id: 'suggestions', label: 'Sugestões Globais', icon: <Lightbulb /> },
+    { path: '/dashboard', label: 'Visão Geral', icon: <LayoutDashboard /> },
+    { path: '/analyze', label: 'Analisar Repositório', icon: <SearchCode /> },
+    { path: '/projects', label: 'Projetos', icon: <FolderGit2 /> },
+    { path: '/commits', label: 'Todos os Commits', icon: <GitCommit /> },
+    { path: '/metrics', label: 'Métricas Globais', icon: <BarChart3 /> },
+    { path: '/suggestions', label: 'Sugestões Globais', icon: <Lightbulb /> },
   ];
 
-  const handleLinkClick = (e, viewId) => {
-    e.preventDefault();
-    setView(viewId);
-    window.location.hash = viewId;
-    setIsOpen(false);
-  };
+  const isActive = (path) => location.pathname === path;
 
   return (
     <>
-      {/* Botão do menu */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="md:hidden fixed top-4 left-4 z-50 bg-white p-2 rounded-lg shadow-md"
@@ -42,7 +38,6 @@ const Sidebar = ({ currentView, setView }) => {
         {isOpen ? <X className="w-6 h-6 text-emerald-600" /> : <Menu className="w-6 h-6 text-emerald-600" />}
       </button>
 
-      {/* Sidebar */}
       <aside
         id='sidebar'
         className={`
@@ -62,35 +57,46 @@ const Sidebar = ({ currentView, setView }) => {
         <nav className="flex-grow">
           <ul className="space-y-2">
             {navItems.map(item => (
-              <li key={item.id}>
-                <a
-                  href={`#${item.id}`}
-                  onClick={(e) => handleLinkClick(e, item.id)}
-                  className={`flex items-center space-x-3 px-4 py-3 text-stone-600 hover:bg-stone-100 hover:text-emerald-600 rounded-lg transition-colors duration-150 group ${currentView === item.id ? 'active-nav-link' : ''}`}
+              <li key={item.path}>
+                <NavLink
+                  to={item.path}
+                  onClick={() => setIsOpen(false)}
+                  className={({ isActive }) =>
+                    `flex items-center space-x-3 px-4 py-3 text-stone-600 hover:bg-stone-100 hover:text-emerald-600 rounded-lg transition-colors duration-150 group ${
+                      isActive ? 'bg-stone-100 text-emerald-600 font-semibold' : ''
+                    }`
+                  }
                 >
                   {React.cloneElement(item.icon, {
-                    className: `w-5 h-5 text-stone-500 group-hover:text-emerald-600 transition-colors duration-150 ${currentView === item.id ? 'text-emerald-600' : ''}`
+                    className: `w-5 h-5 text-stone-500 group-hover:text-emerald-600 transition-colors duration-150 ${
+                      isActive(item.path) ? 'text-emerald-600' : ''
+                    }`,
                   })}
                   <span>{item.label}</span>
-                </a>
+                </NavLink>
               </li>
             ))}
           </ul>
         </nav>
 
         <div className="mt-auto">
-          <a
-            href="#settings"
-            onClick={(e) => handleLinkClick(e, 'settings')}
-            className={`flex items-center space-x-3 px-4 py-3 text-stone-600 hover:bg-stone-100 hover:text-emerald-600 rounded-lg transition-colors duration-150 group ${currentView === 'settings' ? 'active-nav-link' : ''}`}
+          <NavLink
+            to="/settings"
+            onClick={() => setIsOpen(false)}
+            className={({ isActive }) =>
+              `flex items-center space-x-3 px-4 py-3 text-stone-600 hover:bg-stone-100 hover:text-emerald-600 rounded-lg transition-colors duration-150 group ${
+                isActive ? 'bg-stone-100 text-emerald-600 font-semibold' : ''
+              }`
+            }
           >
-            <Settings className={`w-5 h-5 text-stone-500 group-hover:text-emerald-600 transition-colors duration-150 ${currentView === 'settings' ? 'text-emerald-600' : ''}`} />
+            <Settings className={`w-5 h-5 text-stone-500 group-hover:text-emerald-600`} />
             <span>Configurações</span>
-          </a>
-          <a href="#" className="flex items-center space-x-3 px-4 py-3 mt-2 text-stone-600 hover:bg-stone-100 hover:text-red-500 rounded-lg transition-colors duration-150 group">
+          </NavLink>
+
+          <button className="w-full text-left flex items-center space-x-3 px-4 py-3 mt-2 text-stone-600 hover:bg-stone-100 hover:text-red-500 rounded-lg transition-colors duration-150 group">
             <LogOut className="w-5 h-5 text-stone-500 group-hover:text-red-500 transition-colors duration-150" />
             <span>Sair</span>
-          </a>
+          </button>
         </div>
       </aside>
     </>
