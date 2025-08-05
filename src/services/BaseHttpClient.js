@@ -32,7 +32,6 @@ async function request(method, url, data = null, customHeaders = {}) {
 
   try {
     const response = await fetch(fullUrl, config);
-    console.log(`[HTTP] ${method} ${fullUrl} → ${response.status}`);
 
     const responseBody = await response.json().catch(() => ({}));
 
