@@ -1,37 +1,62 @@
 const API_BASE = import.meta.env.VITE_API_URL || 'http://localhost:8080';
 
-const defaultHeaders = {
+let authToken = null;
+
+export function setAuthToken(token) {
+  authToken = token;
+}
+
+function buildHeaders(customHeaders = {}) {
+  const headers = {
     'Content-Type': 'application/json',
-    // todo - colocar o token aqui depois
-    // 'Authorization': `Bearer ${token}`
-};
+    ...(authToken && { Authorization: `Bearer ${authToken}` }),
+    ...customHeaders,
+  };
+  return headers;
+}
 
-async function request(method, url, data) {
-    const config = {
-        method,
-        headers: { ...defaultHeaders },
-    };
+async function request(method, url, data = null, customHeaders = {}) {
+  const config = {
+    method,
+    headers: buildHeaders(customHeaders),
+  };
 
-    if (data && method !== 'GET') {
-        config.body = JSON.stringify(data);
-    }
+  if (data && method !== 'GET') {
+    config.body = JSON.stringify(data);
+  }
 
-    const response = await fetch(`${API_BASE}${url}`, config);
+  const fullUrl = `${API_BASE}${url}`;
+  if (import.meta.env.DEV) {
+    console.log(`[HTTP] ${method} → ${fullUrl}`, data || '');
+  }
+
+  try {
+    const response = await fetch(fullUrl, config);
+    console.log(`[HTTP] ${method} ${fullUrl} → ${response.status}`);
+
+    const responseBody = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        const message = errorData.message || `Erro ${response.status}`;
-        throw new Error(message);
+      const errorMessage = responseBody.message || `Erro ${response.status}`;
+      const error = new Error(errorMessage);
+      error.status = response.status;
+      error.body = responseBody;
+      throw error;
     }
 
-    return response.json().catch(() => ({}));
+    return responseBody;
+  } catch (error) {
+    console.error(`[HTTP ERROR] ${method} ${url}`, error);
+    throw error;
+  }
 }
 
 const BaseHttpClient = {
-    get: (url) => request('GET', url),
-    post: (url, data) => request('POST', url, data),
-    put: (url, data) => request('PUT', url, data),
-    del: (url) => request('DELETE', url),
+  get: (url, headers) => request('GET', url, null, headers),
+  post: (url, data, headers) => request('POST', url, data, headers),
+  put: (url, data, headers) => request('PUT', url, data, headers),
+  del: (url, headers) => request('DELETE', url, null, headers),
+  setAuthToken,
 };
 
 export default BaseHttpClient;
