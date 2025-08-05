@@ -1,5 +1,5 @@
-import React from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useMemo } from 'react';
+import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjectAnalyses } from '../services/ProjectService';
 import {
@@ -16,6 +16,8 @@ import {
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import SummaryCard from '../components/ui/SummaryCard';
+import AuthorsListModal from '../components/modals/AuthorsListModal';
+import CommitsListModal from '../components/modals/CommitsListModal';
 
 function ScoreGauge({ score }) {
   const getScoreColor = (s) => {
@@ -23,41 +25,17 @@ function ScoreGauge({ score }) {
     if (s >= 50) return 'text-yellow-500';
     return 'text-red-500';
   };
-
   const radius = 50;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (score / 100) * circumference;
   const colorClass = getScoreColor(score);
-
   return (
     <div className="relative flex items-center justify-center w-32 h-32 sm:w-40 sm:h-40">
       <svg className="w-full h-full" viewBox="0 0 120 120">
-        <circle
-          className="text-stone-200"
-          strokeWidth="10"
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx="60"
-          cy="60"
-        />
-        <circle
-          className={colorClass}
-          strokeWidth="10"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          strokeLinecap="round"
-          stroke="currentColor"
-          fill="transparent"
-          r={radius}
-          cx="60"
-          cy="60"
-          transform="rotate(-90 60 60)"
-        />
+        <circle className="text-stone-200" strokeWidth="10" stroke="currentColor" fill="transparent" r={radius} cx="60" cy="60" />
+        <circle className={colorClass} strokeWidth="10" strokeDasharray={circumference} strokeDashoffset={offset} strokeLinecap="round" stroke="currentColor" fill="transparent" r={radius} cx="60" cy="60" transform="rotate(-90 60 60)" />
       </svg>
-      <span className={`absolute text-3xl font-bold ${colorClass}`}>
-        {score.toFixed(1)}
-      </span>
+      <span className={`absolute text-3xl font-bold ${colorClass}`}>{score.toFixed(1)}</span>
     </div>
   );
 }
@@ -76,6 +54,9 @@ function StatItem({ icon, label, value, valueClassName = '' }) {
 
 export default function ProjectDetailsView() {
   const { idProjeto } = useParams();
+  
+  const [isAuthorsModalOpen, setIsAuthorsModalOpen] = useState(false);
+  const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
 
   const {
     data: resumo,
@@ -86,6 +67,20 @@ export default function ProjectDetailsView() {
     queryKey: ['projectAnalyses', idProjeto],
     queryFn: () => fetchProjectAnalyses(idProjeto),
   });
+
+  const enrichedCommits = useMemo(() => {
+    if (!resumo?.commits || !resumo?.autores) {
+      return [];
+    }
+    const authorMap = new Map(resumo.autores.map(author => [author.nome, author]));
+    return resumo.commits.map(commit => {
+      const autorCompleto = authorMap.get(commit.autor);
+      return {
+        ...commit,
+        autor: autorCompleto || { nome: commit.autor, email: null }
+      };
+    });
+  }, [resumo]);
 
   if (isLoading) {
     return (
@@ -107,64 +102,28 @@ export default function ProjectDetailsView() {
   }
 
   const {
-    totalCommits = 0,
-    totalCodeSmells = 0,
-    pontuacaoMedia = 0,
     analises = [],
     totalAutores = 0,
-    branchsAnalizadas = [],
+    autores = []
   } = resumo;
   
-  const complexidadeMediaGeral = analises.length > 0
-    ? analises.reduce((acc, curr) => acc + curr.complexidadeMedia, 0) / analises.length
-    : 0;
-
-
   return (
-    <div className="space-y-8">
+    <div className="space-y-8 p-4 md:p-6">
       <section>
         <h2 className="text-2xl font-bold text-stone-700 mb-4">Resumo do Projeto</h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-            <SummaryCard
-                icon={<Award />}
-                title="Pontuação Média"
-                value={`${pontuacaoMedia.toFixed(1)}%`}
-                description="Média de todas as análises"
-                color="green"
-                progress={Math.round(pontuacaoMedia)}
-            />
-            <SummaryCard
-                icon={<ShieldAlert />}
-                title="Total de Code Smells"
-                value={totalCodeSmells}
-                description="Problemas de código"
-                color="amber"
-                progress={Math.min((totalCodeSmells / 500) * 100, 100)}
-            />
-             <SummaryCard
-                icon={<TrendingUp />}
-                title="Total de Commits"
-                value={totalCommits}
-                description="Em todas as branches"
-                color="emerald"
-                progress={Math.min((totalCommits / 1000) * 100, 100)}
-            />
-            <SummaryCard
-                icon={<Users />}
-                title="Autores Únicos"
-                value={totalAutores}
-                description="Contribuidores do projeto"
-                color="violet"
-                progress={Math.min((totalAutores / 10) * 100, 100)}
-            />
-             <SummaryCard
-                icon={<GitMerge />}
-                title="Branches Analisadas"
-                value={branchsAnalizadas.length}
-                description={branchsAnalizadas.join(', ')}
-                color="sky"
-                progress={100}
-            />
+            <SummaryCard icon={<Award />} title="Pontuação Média" value={`${resumo.pontuacaoMedia.toFixed(1)}%`} description="Média de todas as análises" color="green" progress={Math.round(resumo.pontuacaoMedia)} />
+            <SummaryCard icon={<ShieldAlert />} title="Total de Code Smells" value={resumo.totalCodeSmells} description="Problemas de código" color="amber" progress={Math.min((resumo.totalCodeSmells / 500) * 100, 100)} />
+            
+            <div onClick={() => setIsCommitsModalOpen(true)} className="cursor-pointer">
+              <SummaryCard icon={<TrendingUp />} title="Total de Commits" value={resumo.totalCommits} description="Clique para ver o histórico" color="emerald" progress={Math.min(resumo.totalCommits / 1000 * 100, 100)} />
+            </div>
+
+            <div onClick={() => setIsAuthorsModalOpen(true)} className="cursor-pointer">
+              <SummaryCard icon={<Users />} title="Autores Únicos" value={totalAutores} description="Clique para ver detalhes" color="violet" progress={Math.min(totalAutores / 10 * 100, 100)} />
+            </div>
+
+            <SummaryCard icon={<GitMerge />} title="Branches Analisadas" value={resumo.branchsAnalizadas.length} description={resumo.branchsAnalizadas.join(', ')} color="sky" progress={100} />
         </div>
       </section>
 
@@ -179,10 +138,7 @@ export default function ProjectDetailsView() {
         ) : (
           <ul className="space-y-6">
             {analises.map((a, idx) => (
-              <li
-                key={idx}
-                className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl"
-              >
+              <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
                 <div className="p-6 flex flex-col lg:flex-row items-center gap-6">
                   <div className="flex-shrink-0 flex flex-col items-center">
                      <ScoreGauge score={a.pontuacaoTotal} />
@@ -199,10 +155,7 @@ export default function ProjectDetailsView() {
                                Branch: {a.nomeBranch}
                             </h4>
                             <p className="text-xs text-stone-500 mt-1">
-                                Analisado {formatDistanceToNow(new Date(a.dataAnalise), {
-                                locale: ptBR,
-                                addSuffix: true,
-                                })}
+                                Analisado {formatDistanceToNow(new Date(a.dataAnalise), { locale: ptBR, addSuffix: true })}
                             </p>
                         </div>
                      </div>
@@ -220,6 +173,17 @@ export default function ProjectDetailsView() {
           </ul>
         )}
       </section>
+
+      <AuthorsListModal 
+        isOpen={isAuthorsModalOpen}
+        onClose={() => setIsAuthorsModalOpen(false)}
+        autores={autores}
+      />
+      <CommitsListModal
+        isOpen={isCommitsModalOpen}
+        onClose={() => setIsCommitsModalOpen(false)}
+        commits={enrichedCommits}
+      />
     </div>
   );
 }
