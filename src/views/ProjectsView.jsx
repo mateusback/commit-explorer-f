@@ -38,8 +38,7 @@ export default function ProjectsView() {
 
   return (
     <section className="bg-white p-6 rounded-xl shadow-lg">
-      <h3 className="text-xl font-semibold text-emerald-600 mb-4">Gerenciar Projetos dos Alunos</h3>
-      <p className="text-stone-600">Clique em um projeto para ver detalhes.</p>
+      <h3 className="text-xl font-semibold text-emerald-600 mb-4">Gerenciar Projetos Existentes</h3>
 
       <div className="mt-4 space-y-3">
         {projects.map((proj) => (

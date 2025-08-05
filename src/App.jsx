@@ -7,6 +7,7 @@ import Header from './components/layout/Header';
 import DashboardView from './views/DashboardView';
 import AnalyzeView from './views/AnalyzeView';
 import ProjectsView from './views/ProjectsView';
+import ProjectDetailsView from './views/ProjectDetailsView';
 import CommitsView from './views/CommitsView';
 import MetricsView from './views/MetricsView';
 import SuggestionsView from './views/SuggestionsView';
@@ -62,6 +63,7 @@ export default function App() {
                     <Route path="/suggestions" element={<SuggestionsView />} />
                     <Route path="/settings" element={<SettingsView />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
+                    <Route path="/projects/:idProjeto" element={<ProjectDetailsView />} />
                 </Routes>
                 <footer className="mt-8 text-center text-sm text-stone-400 print:hidden">
                     Commit Explorer &copy; 2024

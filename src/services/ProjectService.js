@@ -5,3 +5,8 @@ export async function fetchProjects() {
   const response = await BaseHttpClient.get(APIRoutes.LIST_PROJECTS);
   return response.projetos || [];
 }
+
+export async function fetchProjectAnalyses(idProjeto) {
+  const response = await BaseHttpClient.get(`${APIRoutes.LIST_PROJECT_ANALYSIS}/${idProjeto}`);
+  return response || null;
+}

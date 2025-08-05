@@ -119,12 +119,6 @@ export default function AnalyzeView() {
                     </button>
                 </div>
             </form>
-
-            {showResults && (
-                <div className="mt-8 p-4 bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-lg analysis-placeholder">
-                    Resultados da análise simulados aqui.
-                </div>
-            )}
         </section>
     );
 }
