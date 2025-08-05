@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import UserAvatar from './UserAvatar';
-// Adicionamos o ícone GitMerge para usá-lo
 import { GitCommit, Calendar, GitMerge } from 'lucide-react'; 
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -13,7 +12,7 @@ export default function CommitCard({ commit }) {
   const shortHash = commit.hash.substring(0, 7);
 
   const cardBgClass = commit.ehMerge 
-    ? 'bg-sky-50 hover:bg-sky-100' 
+    ? 'bg-green-50 hover:bg-green-100' 
     : 'bg-white hover:bg-stone-50';
   
   const messageClass = commit.ehMerge 
@@ -28,7 +27,7 @@ export default function CommitCard({ commit }) {
       <div className="flex items-start space-x-4">
         <div className="w-5 h-5 mt-1 flex-shrink-0">
           {commit.ehMerge ? (
-            <GitMerge className="text-violet-500" />
+            <GitMerge className="text-emerald-00" />
           ) : (
             <GitCommit className="text-stone-400" />
           )}
