@@ -26,7 +26,7 @@ function ScoreGauge({ score }) {
 
   const radius = 50;
   const circumference = 2 * Math.PI * radius;
-  const offset = circumference - (score / 10) * circumference;
+  const offset = circumference - (score / 100) * circumference;
   const colorClass = getScoreColor(score);
 
   return (
