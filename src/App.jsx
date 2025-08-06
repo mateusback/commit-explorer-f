@@ -12,6 +12,7 @@ import CommitsView from './views/CommitsView';
 import MetricsView from './views/MetricsView';
 import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
+import CommitDetailsView from './views/CommitDetailsView';
 
 const pageInfo = {
     '/dashboard': {
@@ -64,6 +65,7 @@ export default function App() {
                     <Route path="/settings" element={<SettingsView />} />
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                     <Route path="/projects/:idProjeto" element={<ProjectDetailsView />} />
+                    <Route path="/commits/:id" element={<CommitDetailsView />} />
                 </Routes>
                 <footer className="mt-8 text-center text-sm text-stone-400 print:hidden">
                     Commit Explorer &copy; 2024
