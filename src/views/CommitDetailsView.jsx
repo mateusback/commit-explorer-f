@@ -8,6 +8,8 @@ import FileChangeCard from '../components/FileChangeCard';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
+//TODO - DEIXAR ESSA TELA EM UM MODAL
+
 function ScoreStatCard({ score }) {
   const getScoreColor = (s) => {
     if (s >= 80) return { text: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-200' };
@@ -40,12 +42,12 @@ function StatItem({ icon, label, value }) {
 }
 
 export default function CommitDetailsView() {
-  const { id } = useParams(); // <-- CORREÇÃO PRINCIPAL AQUI
+  const { id } = useParams();
   const [copied, setCopied] = useState(false);
 
   const { data: commit, isLoading, isError, error } = useQuery({
-    queryKey: ['commitDetails', id], // <-- CORREÇÃO AQUI
-    queryFn: () => fetchCommitDetails(id), // <-- CORREÇÃO AQUI
+    queryKey: ['commitDetails', id],
+    queryFn: () => fetchCommitDetails(id),
   });
 
   const handleCopy = () => {

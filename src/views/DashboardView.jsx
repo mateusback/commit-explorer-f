@@ -1,11 +1,11 @@
 import React from 'react';
-import SummaryCard from '../components/ui/SummaryCard';
+import ProgressSummaryCard from '../components/ui/ProgressSummaryCard';
 import { TrendingUp, ShieldAlert, Puzzle, Award } from 'lucide-react';
 
 export default function DashboardView() {
     return (
         <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <SummaryCard
+            <ProgressSummaryCard
                 icon={<TrendingUp />}
                 title="Frequência Total de Commits"
                 value="875"
@@ -13,7 +13,7 @@ export default function DashboardView() {
                 color="emerald"
                 progress={65}
             />
-            <SummaryCard
+            <ProgressSummaryCard
                 icon={<ShieldAlert />}
                 title="Total de Code Smells"
                 value="158"
@@ -21,7 +21,7 @@ export default function DashboardView() {
                 color="amber"
                 progress={50}
             />
-            <SummaryCard
+            <ProgressSummaryCard
                 icon={<Puzzle />}
                 title="Complexidade Média de Projeto"
                 value="8.1"
@@ -29,7 +29,7 @@ export default function DashboardView() {
                 color="sky"
                 progress={68}
             />
-            <SummaryCard
+            <ProgressSummaryCard
                 icon={<Award />}
                 title="Pontuação Média de Qualidade"
                 value="79%"

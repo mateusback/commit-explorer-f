@@ -6,6 +6,7 @@ import { NotificationService } from '../services/NotificationService';
 
 export default function AnalyzeView() {
     const [startDate, setStartDate] = useState('');
+    const [projectName, setProjectName] = useState('');
     const [endDate, setEndDate] = useState('');
     const [projectLink, setProjectLink] = useState('');
     const [repositories, setRepositories] = useState([{ url: '', branch: 'main' }]);
@@ -30,6 +31,11 @@ export default function AnalyzeView() {
         e.preventDefault();
         setShowResults(false);
 
+        if (!projectName.trim()) {
+            NotificationService.error('Por favor, informe o nome do projeto.');
+            return;
+        }
+
         if (!repositories.length || repositories.some(r => !r.url)) {
             NotificationService.error('Por favor, adicione pelo menos um repositório válido.');
             return;
@@ -38,6 +44,7 @@ export default function AnalyzeView() {
         setLoading(true);
 
         const payload = {
+            projectName,
             startDate,
             endDate,
             projectLink,
@@ -60,6 +67,19 @@ export default function AnalyzeView() {
             <form onSubmit={handleSubmit}>
                 <h3 className="text-xl font-semibold text-emerald-600 mb-1">Analisar Repositórios</h3>
                 <p className="text-stone-500 mb-6">Insira os detalhes para iniciar a análise.</p>
+
+                <div className="mb-6">
+                    <label className="block text-sm font-medium text-stone-600 mb-1">
+                        Nome do Projeto <span className="text-red-500">*</span>
+                    </label>
+                    <input 
+                        type="text" 
+                        placeholder="Ex: BackEnd - Commit Explorer"
+                        className="w-full p-2 border border-stone-300 rounded-lg focus:ring-2 focus:ring-emerald-500"
+                        value={projectName} 
+                        onChange={e => setProjectName(e.target.value)} 
+                    />
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
                     <div>
