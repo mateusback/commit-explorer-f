@@ -5,8 +5,14 @@ import { GitCommit, Calendar, GitMerge, Award } from 'lucide-react';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-export default function CommitCard({ commit }) {
+export default function CommitCard({ commit, onCommitSelect }) {
   if (!commit) return null;
+
+  const getScoreColor = (s) => {
+    if (s >= 75) return 'text-emerald-600';
+    if (s >= 50) return 'text-amber-600';
+    return 'text-red-600';
+  };
 
   const truncatedMessage = commit.mensagem.split('\n')[0];
   const shortHash = commit.hash.substring(0, 7);
@@ -19,10 +25,13 @@ export default function CommitCard({ commit }) {
     ? 'italic text-stone-600'
     : 'font-medium text-stone-800';
 
+  const scoreColorClass = commit.pontuacao != null ? getScoreColor(commit.pontuacao) : 'text-stone-500';
+
   return (
-    <Link 
-      to={`/commits/${commit.id}`} 
-      className={`block p-4 rounded-lg shadow-sm transition-all ${cardBgClass}`}
+    <button
+      type="button"
+      onClick={() => onCommitSelect(commit.id)} 
+      className={`block w-full text-left p-4 rounded-lg shadow-sm transition-all ${cardBgClass}`}
     >
       <div className="flex items-start space-x-4">
         <div className="w-5 h-5 mt-1 flex-shrink-0">
@@ -42,8 +51,10 @@ export default function CommitCard({ commit }) {
           <div className="flex items-center justify-between mt-2 text-xs text-stone-500">
             <div className="flex items-center space-x-4">
               <div className="flex items-center">
-                <UserAvatar autor={commit.autor} className="w-4 h-4 mr-1.5" />
-                <span>{commit.autor.nome}</span>
+                <Link to={`/autores/${commit.autor.id}`} className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                  <UserAvatar autor={commit.autor} className="w-4 h-4 mr-1.5" />
+                  <span className="hover:underline">{commit.autor.nome}</span>
+                </Link>
               </div>
               <div className="flex items-center">
                 <Calendar className="w-3 h-3 mr-1.5" />
@@ -51,7 +62,7 @@ export default function CommitCard({ commit }) {
               </div>
             </div>
             {commit.pontuacao != null && (
-              <div className="flex items-center font-bold text-amber-600">
+              <div className={`flex items-center font-bold ${scoreColorClass}`}>
                 <Award className="w-4 h-4 mr-1" />
                 <span>{commit.pontuacao.toFixed(1)}</span>
               </div>
@@ -59,6 +70,6 @@ export default function CommitCard({ commit }) {
           </div>
         </div>
       </div>
-    </Link>
+    </button>
   );
 }

@@ -11,24 +11,32 @@ function getGravatarUrl(email) {
 }
 
 export default function UserAvatar({ autor, className = 'w-10 h-10' }) {
-  const [imageSrc, setImageSrc] = useState(autor.avatarUrl || getGravatarUrl(autor.email) || fallbackImage);
+  const [imageSrc, setImageSrc] = useState(fallbackImage);
 
   useEffect(() => {
-    setImageSrc(autor.avatarUrl || getGravatarUrl(autor.email) || fallbackImage);
+    const customUrl = autor.avatarUrl || getGravatarUrl(autor.email);
+    if (!customUrl) {
+      setImageSrc(fallbackImage);
+      return;
+    }
+
+    const img = new Image();
+    img.src = customUrl;
+
+    img.onload = () => {
+      setImageSrc(customUrl);
+    };
+
+    img.onerror = () => {
+      setImageSrc(fallbackImage);
+    };
   }, [autor]);
 
-  const handleError = () => {
-    if (imageSrc !== fallbackImage) {
-      setImageSrc(fallbackImage);
-    }
-  };
-  
   return (
     <img
       src={imageSrc}
       alt={`Avatar de ${autor.nome}`}
       className={`${className} rounded-full object-cover bg-stone-200`}
-      onError={handleError}
     />
   );
 }

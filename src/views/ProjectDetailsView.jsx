@@ -22,6 +22,7 @@ import StatSummaryCard from '../components/ui/StatSummaryCard';
 
 import AuthorsListModal from '../components/modals/AuthorsListModal';
 import CommitsListModal from '../components/modals/CommitsListModal';
+import CommitDetailsModal from '../components/modals/CommitDetailsModal';
 
 function ScoreGauge({ score }) {
   const getScoreColor = (s) => {
@@ -53,7 +54,7 @@ function StatItem({ icon, label, value, valueClassName = '' }) {
         <p className={`text-lg font-semibold text-stone-800 ${valueClassName}`}>{value}</p>
       </div>
     </div>
-  )
+  );
 }
 
 export default function ProjectDetailsView() {
@@ -61,6 +62,7 @@ export default function ProjectDetailsView() {
 
   const [isAuthorsModalOpen, setIsAuthorsModalOpen] = useState(false);
   const [isCommitsModalOpen, setIsCommitsModalOpen] = useState(false);
+  const [selectedCommitId, setSelectedCommitId] = useState(null);
 
   const {
     data: resumo,
@@ -71,6 +73,17 @@ export default function ProjectDetailsView() {
     queryKey: ['projectAnalyses', idProjeto],
     queryFn: () => fetchProjectAnalyses(idProjeto),
   });
+
+  const commitIds = useMemo(() => resumo?.commits.map(c => c.id) || [], [resumo]);
+  const handleCommitSelect = (id) => {
+    setIsCommitsModalOpen(false);
+    setSelectedCommitId(id); 
+  };
+
+  const handleCloseCommitDetails = () => {
+    setSelectedCommitId(null);
+    setIsCommitsModalOpen(true);
+  };
 
   const enrichedCommits = useMemo(() => {
     if (!resumo?.commits || !resumo?.autores) {
@@ -119,9 +132,9 @@ export default function ProjectDetailsView() {
           <ProgressSummaryCard
             icon={<Award />}
             title="Pontuação Média"
-            value={`${resumo.pontuacaoMedia.toFixed(1)}%`}
+            value={`${resumo.pontuacaoMedia.toFixed(1)}`}
             description="Média de todas as análises"
-            color={resumo.pontuacaoMedia > 75 ? 'emerald' : resumo.pontuacaoMedia > 50 ? 'amber' : 'red'}
+            color={resumo.pontuacaoMedia >= 75 ? 'emerald' : resumo.pontuacaoMedia >= 50 ? 'amber' : 'red'}
             progress={Math.round(resumo.pontuacaoMedia)}
           />
           <StatSummaryCard
@@ -131,25 +144,24 @@ export default function ProjectDetailsView() {
             description="Problemas de código"
             color="amber"
           />
-
-          <StatSummaryCard
-            icon={<TrendingUp />}
-            title="Total de Commits"
-            value={resumo.totalCommits}
-            description="Clique para ver o histórico"
-            color="emerald"
-            onClick={() => setIsCommitsModalOpen(true)}
-          />
-
-          <StatSummaryCard
-            icon={<Users />}
-            title="Autores Únicos"
-            value={totalAutores}
-            description="Clique para ver detalhes"
-            color="violet"
-            onClick={() => setIsAuthorsModalOpen(true)}
-          />
-
+          <div onClick={() => setIsCommitsModalOpen(true)} className="cursor-pointer h-full">
+            <StatSummaryCard
+              icon={<TrendingUp />}
+              title="Total de Commits"
+              value={resumo.totalCommits}
+              description="Clique para ver o histórico"
+              color="emerald"
+            />
+          </div>
+          <div onClick={() => setIsAuthorsModalOpen(true)} className="cursor-pointer h-full">
+            <StatSummaryCard
+              icon={<Users />}
+              title="Autores Únicos"
+              value={totalAutores}
+              description="Clique para ver detalhes"
+              color="violet"
+            />
+          </div>
           <StatSummaryCard
             icon={<GitMerge />}
             title="Branches Analisadas"
@@ -177,12 +189,10 @@ export default function ProjectDetailsView() {
                     <ScoreGauge score={a.pontuacaoTotal} />
                     <p className="mt-2 text-sm font-medium text-stone-600">Pontuação de Qualidade</p>
                   </div>
-
                   <div className="hidden lg:block w-px bg-stone-200 self-stretch"></div>
-
                   <div className="flex-grow w-full">
                     <div className="flex justify-between items-start mb-4">
-                      <div>
+                      <div className="flex-grow">
                         <h4 className="flex items-center text-xl font-bold text-emerald-700">
                           <GitMerge className="w-5 h-5 mr-2" />
                           Branch: {a.nomeBranch}
@@ -191,7 +201,6 @@ export default function ProjectDetailsView() {
                           Analisado {formatDistanceToNow(new Date(a.dataAnalise), { locale: ptBR, addSuffix: true })}
                         </p>
                       </div>
-
                       <div className="text-right flex-shrink-0 ml-4">
                         {a.dataInicio && a.dataFim && (
                           <>
@@ -204,7 +213,6 @@ export default function ProjectDetailsView() {
                         )}
                       </div>
                     </div>
-
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                       <StatItem icon={<Siren size={24} />} label="Code Smells" value={a.quantidadeCodeSmells} valueClassName={a.quantidadeCodeSmells > 20 ? 'text-red-500' : 'text-stone-800'} />
                       <StatItem icon={<Puzzle size={24} />} label="Complexidade Média" value={a.complexidadeMedia?.toFixed(1)} />
@@ -228,6 +236,13 @@ export default function ProjectDetailsView() {
         isOpen={isCommitsModalOpen}
         onClose={() => setIsCommitsModalOpen(false)}
         commits={enrichedCommits}
+        onCommitSelect={handleCommitSelect}
+      />
+      <CommitDetailsModal
+        isOpen={!!selectedCommitId}
+        onClose={handleCloseCommitDetails}
+        initialCommitId={selectedCommitId}
+        allCommitIds={commitIds}
       />
     </div>
   );

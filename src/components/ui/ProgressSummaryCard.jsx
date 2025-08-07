@@ -1,6 +1,5 @@
 import React from 'react';
 
-// Mapeamento de cores mais robusto e explícito
 const colorVariants = {
   emerald: {
     icon: 'text-emerald-600 bg-emerald-50 ring-emerald-100',
@@ -25,7 +24,6 @@ const colorVariants = {
 };
 
 export default function ProgressSummaryCard({ icon, title, value, description, color, progress }) {
-  // Define um padrão e pega o objeto de estilos completo
   const colorStyles = colorVariants[color] || colorVariants.emerald;
 
   return (
@@ -45,7 +43,6 @@ export default function ProgressSummaryCard({ icon, title, value, description, c
       <div className="mt-4">
         <div className="h-2 w-full bg-stone-100 rounded-full">
           <div 
-            // Usa a classe de progresso diretamente, sem manipulação de string
             className={`h-2 rounded-full ${colorStyles.progress}`} 
             style={{ width: `${progress}%` }}
           />

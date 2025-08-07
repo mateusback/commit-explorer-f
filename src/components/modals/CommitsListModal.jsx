@@ -2,7 +2,7 @@ import React from 'react';
 import { X, GitCommit } from 'lucide-react';
 import CommitCard from '../CommitCard';
 
-export default function CommitsListModal({ isOpen, onClose, commits = [] }) {
+export default function CommitsListModal({ isOpen, onClose, commits = [], onCommitSelect }) {
   if (!isOpen) {
     return null;
   }
@@ -30,8 +30,8 @@ export default function CommitsListModal({ isOpen, onClose, commits = [] }) {
           {commits.length > 0 ? (
             <ul className="space-y-3">
               {commits.map(commit => (
-                <li key={commit.hash}>
-                  <CommitCard commit={commit} />
+                <li key={commit.id}>
+                  <CommitCard commit={commit} onCommitSelect={onCommitSelect} />
                 </li>
               ))}
             </ul>
