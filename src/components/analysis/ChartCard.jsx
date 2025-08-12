@@ -2,12 +2,10 @@ import React from 'react';
 
 export default function ChartCard({ title, children }) {
   return (
-    <div className="card bg-base-100 shadow-lg transition-shadow duration-300 hover:shadow-2xl">
-      <div className="card-body">
-        <h2 className="card-title text-lg mb-2">{title}</h2>
-        <div className="h-72 w-full"> 
-          {children}
-        </div>
+    <div className="bg-white p-5 rounded-xl shadow-sm ring-1 ring-stone-100 h-full flex flex-col">
+      <h3 className="font-semibold text-stone-700 mb-4">{title}</h3>
+      <div className="flex-grow h-72 w-full"> 
+        {children}
       </div>
     </div>
   );

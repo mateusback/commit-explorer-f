@@ -1,44 +1,39 @@
 import React from 'react';
+import { ArrowLeft, Calendar, GitBranch, GitCommit } from 'lucide-react';
 
-const Icon = ({ name }) => <i className={`bi bi-${name}`}></i>;
-
-export default function AnalysisHeader({ studentName, repoName, onUpdate }) {
+export default function AnalysisPageHeader({ projectName, repoUrl, branchName, startDate, endDate, projectId }) {
   return (
-    <div>
-      <div className="p-6 rounded-lg bg-gradient-to-r from-primary to-secondary text-primary-content shadow-lg">
-        <h1 className="text-3xl font-bold flex items-center gap-3">
-          <Icon name="graph-up" />
-          Dashboard de Análise de Commits
-        </h1>
-        <p className="opacity-75 mt-1">
-          Análise detalhada para: <strong>{studentName} - {repoName}</strong>
-        </p>
-      </div>
-
-      <div className="card bg-base-100 shadow-md my-6">
-        <div className="card-body">
-          <h2 className="card-title text-lg mb-4"><Icon name="funnel" /> Filtros</h2>
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 items-end">
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Data de Início</span>
-              </label>
-              <input type="date" className="input input-bordered w-full" defaultValue="2024-01-01" />
-            </div>
-            <div className="form-control w-full">
-              <label className="label">
-                <span className="label-text">Data de Fim</span>
-              </label>
-              <input type="date" className="input input-bordered w-full" defaultValue="2024-01-10" />
-            </div>
-            <div className="form-control w-full md:col-span-2">
-              <button className="btn btn-primary" onClick={onUpdate}>
-                <Icon name="arrow-clockwise" /> Atualizar Análise
-              </button>
-            </div>
-          </div>
+    <header className="bg-white p-6 rounded-xl shadow-sm ring-1 ring-stone-100">
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between">
+        <div>
+          <a href={`/projeto/${projectId}`} className="flex items-center text-sm text-stone-500 hover:text-emerald-600 transition-colors mb-2">
+            <ArrowLeft size={16} className="mr-2" />
+            Voltar para o Projeto
+          </a>
+          <h1 className="text-3xl font-bold text-stone-800">
+            {projectName || 'Análise do Projeto'}
+          </h1>
+        </div>
+        <div className="flex items-center gap-2 text-sm text-stone-600 bg-stone-100 px-3 py-2 rounded-lg mt-4 md:mt-0">
+          <Calendar size={16} className="text-stone-500" />
+          <strong>Período:</strong>
+          <span>{startDate} - {endDate}</span>
         </div>
       </div>
-    </div>
+      
+      <div className="divider my-4"></div>
+      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-stone-500">
+        <div className="flex items-center gap-2">
+          <GitBranch size={16} />
+          <strong>Repositório:</strong>
+          <span className="font-mono text-emerald-700">{repoUrl || 'N/A'}</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <GitCommit size={16} />
+          <strong>Branch:</strong>
+          <span>{branchName || 'N/A'}</span>
+        </div>
+      </div>
+    </header>
   );
 }

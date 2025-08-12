@@ -49,15 +49,15 @@ export default function CommitFrequencyChart({ data = [] }) {
   const backgroundColor = (ctx) => {
     const { chart } = ctx;
     const { ctx: context, chartArea } = chart;
-    if (!chartArea) return 'rgba(111, 191, 115, 0.1)';
+    if (!chartArea) return 'rgba(16, 185, 129, 0.1)';
 
     const gradient = context.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
-    gradient.addColorStop(0, 'rgba(111, 191, 115, 0.25)');
-    gradient.addColorStop(1, 'rgba(111, 191, 115, 0.05)');
+    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+    gradient.addColorStop(1, 'rgba(16, 185, 129, 0.05)');
     return gradient;
   };
 
-  const primaryStroke = 'rgba(111, 191, 115, 1)';
+  const primaryStroke = '#10b981';
   const gridColor = 'rgba(0,0,0,0.06)';
   const tickColor = 'rgba(0,0,0,0.55)';
 
@@ -92,7 +92,7 @@ export default function CommitFrequencyChart({ data = [] }) {
       plugins: {
         legend: { display: false },
         title: {
-          display: false, //Vou deixar assim, por enquanto
+          display: false,
           text: 'Frequência de Commits',
           color: 'var(--fallback-bc, rgb(28,28,28))',
           font: { weight: '600', size: 16 },
@@ -153,7 +153,7 @@ export default function CommitFrequencyChart({ data = [] }) {
 
   return (
     <ChartCard title="Frequência de Commits">
-      <div className="h-72">
+      <div className="h-full w-full">
         <Line ref={canvasRef} options={options} data={chartData} plugins={[lineShadowPlugin]} />
       </div>
     </ChartCard>

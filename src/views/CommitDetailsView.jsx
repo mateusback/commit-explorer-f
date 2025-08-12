@@ -8,8 +8,6 @@ import FileChangeCard from '../components/FileChangeCard';
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
-//TODO - DEIXAR ESSA TELA EM UM MODAL
-
 function ScoreStatCard({ score }) {
   const getScoreColor = (s) => {
     if (s >= 80) return { text: 'text-emerald-600', bg: 'bg-emerald-50', ring: 'ring-emerald-200' };

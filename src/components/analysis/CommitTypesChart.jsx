@@ -7,24 +7,10 @@ import {
   Legend,
 } from 'chart.js';
 import ChartCard from './ChartCard';
+import TIPO_COMMIT_CORES from '../../utils/Colors';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
 
-const TIPO_COMMIT_CORES = {
-  FEATURE: '#60a5fa',
-  BUGFIX: '#f87171',
-  REFACTOR: '#818cf8',
-  PERFORMANCE: '#a78bfa',
-  DOCUMENTATION: '#34d399',
-  TEST: '#2dd4bf',
-  BUILD: '#94a3b8',
-  CI: '#38bdf8',
-  CHORE: '#a1a1aa',
-  STYLE: '#f472b6',
-  CLEANUP: '#22d3ee',
-  REMOVE: '#fb923c',
-  DEFAULT: '#9ca3af',
-};
 
   const centerTextPlugin = {
     id: 'centerText',

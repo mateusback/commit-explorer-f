@@ -1,5 +1,3 @@
-// src/components/AuthorsListModal.jsx
-
 import React from 'react';
 import { X, Users } from 'lucide-react';
 import AuthorCard from '../AuthorCard';
