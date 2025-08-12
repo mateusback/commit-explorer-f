@@ -77,7 +77,7 @@ export default function ProjectDetailsView() {
   const commitIds = useMemo(() => resumo?.commits.map(c => c.id) || [], [resumo]);
   const handleCommitSelect = (id) => {
     setIsCommitsModalOpen(false);
-    setSelectedCommitId(id); 
+    setSelectedCommitId(id);
   };
 
   const handleCloseCommitDetails = () => {
@@ -183,45 +183,48 @@ export default function ProjectDetailsView() {
         ) : (
           <ul className="space-y-6">
             {analises.map((a, idx) => (
-              <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
-                <div className="p-6 flex flex-col lg:flex-row items-center gap-6">
-                  <div className="flex-shrink-0 flex flex-col items-center">
-                    <ScoreGauge score={a.pontuacaoTotal} />
-                    <p className="mt-2 text-sm font-medium text-stone-600">Pontuação de Qualidade</p>
-                  </div>
-                  <div className="hidden lg:block w-px bg-stone-200 self-stretch"></div>
-                  <div className="flex-grow w-full">
-                    <div className="flex justify-between items-start mb-4">
-                      <div className="flex-grow">
-                        <h4 className="flex items-center text-xl font-bold text-emerald-700">
-                          <GitMerge className="w-5 h-5 mr-2" />
-                          Branch: {a.nomeBranch}
-                        </h4>
-                        <p className="text-xs text-stone-500 mt-1">
-                          Analisado {formatDistanceToNow(new Date(a.dataAnalise), { locale: ptBR, addSuffix: true })}
-                        </p>
+              console.log(a),
+              <Link key={a.id || idx} to={`/analise/${a.id}`}>
+                <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
+                  <div className="p-6 flex flex-col lg:flex-row items-center gap-6">
+                    <div className="flex-shrink-0 flex flex-col items-center">
+                      <ScoreGauge score={a.pontuacaoTotal} />
+                      <p className="mt-2 text-sm font-medium text-stone-600">Pontuação de Qualidade</p>
+                    </div>
+                    <div className="hidden lg:block w-px bg-stone-200 self-stretch"></div>
+                    <div className="flex-grow w-full">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex-grow">
+                          <h4 className="flex items-center text-xl font-bold text-emerald-700">
+                            <GitMerge className="w-5 h-5 mr-2" />
+                            Branch: {a.nomeBranch}
+                          </h4>
+                          <p className="text-xs text-stone-500 mt-1">
+                            Analisado {formatDistanceToNow(new Date(a.dataAnalise), { locale: ptBR, addSuffix: true })}
+                          </p>
+                        </div>
+                        <div className="text-right flex-shrink-0 ml-4">
+                          {a.dataInicio && a.dataFim && (
+                            <>
+                              <p className="font-semibold text-stone-700 flex items-center justify-end gap-1.5">
+                                <Calendar size={14} />
+                                {format(new Date(a.dataInicio), 'dd/MM/yy')} - {format(new Date(a.dataFim), 'dd/MM/yy')}
+                              </p>
+                              <p className="text-xs text-stone-500">Período Analisado</p>
+                            </>
+                          )}
+                        </div>
                       </div>
-                      <div className="text-right flex-shrink-0 ml-4">
-                        {a.dataInicio && a.dataFim && (
-                          <>
-                            <p className="font-semibold text-stone-700 flex items-center justify-end gap-1.5">
-                              <Calendar size={14} />
-                              {format(new Date(a.dataInicio), 'dd/MM/yy')} - {format(new Date(a.dataFim), 'dd/MM/yy')}
-                            </p>
-                            <p className="text-xs text-stone-500">Período Analisado</p>
-                          </>
-                        )}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <StatItem icon={<Siren size={24} />} label="Code Smells" value={a.quantidadeCodeSmells} valueClassName={a.quantidadeCodeSmells > 20 ? 'text-red-500' : 'text-stone-800'} />
+                        <StatItem icon={<Puzzle size={24} />} label="Complexidade Média" value={a.complexidadeMedia?.toFixed(1)} />
+                        <StatItem icon={<GitCommit size={24} />} label="Commits na Análise" value={a.totalCommits} />
+                        <StatItem icon={<Users size={24} />} label="Autores na Análise" value={a.totalAutores} />
                       </div>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <StatItem icon={<Siren size={24} />} label="Code Smells" value={a.quantidadeCodeSmells} valueClassName={a.quantidadeCodeSmells > 20 ? 'text-red-500' : 'text-stone-800'} />
-                      <StatItem icon={<Puzzle size={24} />} label="Complexidade Média" value={a.complexidadeMedia?.toFixed(1)} />
-                      <StatItem icon={<GitCommit size={24} />} label="Commits na Análise" value={a.totalCommits} />
-                      <StatItem icon={<Users size={24} />} label="Autores na Análise" value={a.totalAutores} />
-                    </div>
                   </div>
-                </div>
-              </li>
+                </li>
+              </Link>
             ))}
           </ul>
         )}
@@ -244,6 +247,6 @@ export default function ProjectDetailsView() {
         initialCommitId={selectedCommitId}
         allCommitIds={commitIds}
       />
-    </div>
+    </div >
   );
 }

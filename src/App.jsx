@@ -13,6 +13,35 @@ import MetricsView from './views/MetricsView';
 import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
 import CommitDetailsView from './views/CommitDetailsView';
+import AnalysisDetailsPage from './views/AnalysisDetailsPage';
+
+import {
+  Chart as ChartJS,
+  CategoryScale, // 👈 Essencial para eixos com labels (nomes, datas, etc.)
+  LinearScale,   // 👈 Essencial para eixos com valores numéricos
+  PointElement,  // Para os pontos em gráficos de linha
+  LineElement,   // Para as linhas em gráficos de linha
+  BarElement,    // Para as barras em gráficos de barras
+  ArcElement,    // Para os arcos em gráficos de pizza/doughnut
+  Title,         // Para os títulos dos gráficos
+  Tooltip,       // Para as caixas de informação ao passar o mouse
+  Legend,        // Para as legendas
+  Filler         // Para preenchimento de área em gráficos de linha
+} from 'chart.js';
+
+// Registra todos os componentes que nossos gráficos usarão na aplicação inteira
+ChartJS.register(
+  CategoryScale,
+  LinearScale,
+  PointElement,
+  LineElement,
+  BarElement,
+  ArcElement,
+  Title,
+  Tooltip,
+  Legend,
+  Filler
+);
 
 const pageInfo = {
     '/dashboard': {
@@ -66,6 +95,7 @@ export default function App() {
                     <Route path="*" element={<Navigate to="/dashboard" />} />
                     <Route path="/projects/:idProjeto" element={<ProjectDetailsView />} />
                     <Route path="/commits/:id" element={<CommitDetailsView />} />
+                    <Route path="/analise/:analysisId" element={<AnalysisDetailsPage />} />
                 </Routes>
                 <footer className="mt-8 text-center text-sm text-stone-400 print:hidden">
                     Commit Explorer &copy; 2024
