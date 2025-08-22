@@ -109,7 +109,10 @@ export default function AnalysisDetailsPage() {
 
             {/* Avaliação só na aba geral */}
             {activeTab === 'geral' && (
-              <EvaluationSection score={data.geral.pontuacaoTotal} />
+              <EvaluationSection
+                score={data.geral?.pontuacaoTotal}
+                feedbackData={data?.feedback}
+              />
             )}
           </>
         ) : (

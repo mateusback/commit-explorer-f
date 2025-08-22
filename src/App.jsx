@@ -29,7 +29,6 @@ import {
   Filler         // Para preenchimento de área em gráficos de linha
 } from 'chart.js';
 
-// Registra todos os componentes que nossos gráficos usarão na aplicação inteira
 ChartJS.register(
   CategoryScale,
   LinearScale,
