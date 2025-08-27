@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, useNavigate } from 'react-router-dom';
+import { useAuth } from '../auth/AuthContext';
 import {
   LayoutDashboard,
   SearchCode,
@@ -17,6 +18,14 @@ import {
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    logout();
+    navigate('/login');
+    setIsOpen(false);
+  };
 
   const navItems = [
     { path: '/dashboard', label: 'Visão Geral', icon: <LayoutDashboard /> },
@@ -93,7 +102,10 @@ const Sidebar = () => {
             <span>Configurações</span>
           </NavLink>
 
-          <button className="w-full text-left flex items-center space-x-3 px-4 py-3 mt-2 text-stone-600 hover:bg-stone-100 hover:text-red-500 rounded-lg transition-colors duration-150 group">
+          <button
+            onClick={handleLogout}
+            className="w-full text-left flex items-center space-x-3 px-4 py-3 mt-2 text-stone-600 hover:bg-stone-100 hover:text-red-500 rounded-lg transition-colors duration-150 group"
+          >
             <LogOut className="w-5 h-5 text-stone-500 group-hover:text-red-500 transition-colors duration-150" />
             <span>Sair</span>
           </button>

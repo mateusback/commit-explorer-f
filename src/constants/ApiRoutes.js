@@ -2,6 +2,7 @@ const gitRoute = '/api/v1/git';
 const projectsRoute = '/api/v1/projects';
 const commitRoute = '/api/v1/commits';
 const analysisRoute = '/api/v1/analysis';
+const authRoute = '/auth';
 
 const APIRoutes = {
   ANALYZE_REPOSITORIES: `${gitRoute}/analyze`,
@@ -9,6 +10,8 @@ const APIRoutes = {
   LIST_PROJECT_ANALYSIS: `${projectsRoute}/analysis`,
   GET_COMMIT_BY_ID: (idCommit) => `${commitRoute}/${idCommit}`,
   GET_ANALYSIS_BY_ID: (idAnalysis) => `${analysisRoute}/${idAnalysis}`,
+  AUTH_LOGIN: `${authRoute}/login`,
+  AUTH_REGISTER: `${authRoute}/signup`,
 };
 
 export default APIRoutes;
