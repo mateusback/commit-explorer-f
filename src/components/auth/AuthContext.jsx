@@ -8,6 +8,7 @@ const STORAGE_KEY = 'ce_auth_token';
 const AuthContext = createContext({
     token: null,
     isAuthenticated: false,
+    isLoading: true,
     login: async () => {},
     register: async () => {},
     logout: () => {},
@@ -15,6 +16,7 @@ const AuthContext = createContext({
 
 export function AuthProvider({ children }) {
     const [token, setToken] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
 
     useEffect(() => {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -22,6 +24,7 @@ export function AuthProvider({ children }) {
             setToken(saved);
             setAuthToken(saved);
         }
+        setIsLoading(false);
     }, []);
 
     const login = async (credentials) => {
@@ -48,13 +51,17 @@ export function AuthProvider({ children }) {
         NotificationService.info('Você saiu da aplicação.');
     };
 
-    const value = useMemo(() => ({
-        token,
-        isAuthenticated: Boolean(token),
-        login,
-        register,
-        logout,
-    }), [token]);
+    const value = useMemo(() => {
+        const isAuthenticated = Boolean(token);
+        return {
+            token,
+            isAuthenticated,
+            isLoading,
+            login,
+            register,
+            logout,
+        };
+    }, [token, isLoading]);
 
     return (
         <AuthContext.Provider value={value}>

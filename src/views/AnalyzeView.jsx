@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { PlusCircle, PlayCircle, Loader2 } from 'lucide-react';
 import RepoInputGroup from '../components/input/RepoInputGroup';
-import { analyzeRepositories } from '../services/analysisService';
+import { analyzeRepositories } from '../services/AnalysisService';
 import { NotificationService } from '../services/NotificationService';
 
 function toDateOnly(value) {
