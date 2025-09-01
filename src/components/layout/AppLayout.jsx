@@ -2,8 +2,11 @@ import React from 'react';
 import { Outlet, useMatches } from 'react-router-dom';
 import Sidebar from '../layout/Sidebar';
 import Header from '../layout/Header';
+import { useAuthInterceptor } from '../../hooks/useAuthInterceptor';
 
 export default function AppLayout() {
+  useAuthInterceptor();
+  
   const matches = useMatches();
   const meta = [...matches].reverse().find(m => m.handle?.title) ?.handle ?? {
     title: 'Visão Geral dos Projetos',

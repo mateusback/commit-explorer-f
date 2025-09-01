@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../components/auth/AuthContext';
 import { NotificationService } from '../services/NotificationService';
@@ -8,6 +8,14 @@ export default function LoginView() {
     const navigate = useNavigate();
     const [form, setForm] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
+
+    useEffect(() => {
+        const sessionExpired = sessionStorage.getItem('sessionExpired');
+        if (sessionExpired) {
+            NotificationService.info('Sua sessão expirou. Faça login novamente.');
+            sessionStorage.removeItem('sessionExpired');
+        }
+    }, []);
 
     const handleChange = (e) => {
         const { name, value } = e.target;

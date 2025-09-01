@@ -6,6 +6,17 @@ export function setAuthToken(token) {
   authToken = token;
 }
 
+function handleUnauthorized() {
+  
+  localStorage.removeItem('ce_auth_token');
+  authToken = null;
+  
+  if (window.location.pathname !== '/login') {
+    sessionStorage.setItem('sessionExpired', 'true');
+    window.location.href = '/login';
+  }
+}
+
 function buildHeaders(customHeaders = {}) {
   const headers = {
     'Content-Type': 'application/json',
@@ -36,6 +47,16 @@ async function request(method, url, data = null, customHeaders = {}) {
     const responseBody = await response.json().catch(() => ({}));
 
     if (!response.ok) {
+      // Se for erro 401, fazer logout automático
+      if (response.status === 401) {
+        handleUnauthorized();
+        
+        const error = new Error('Sessão expirada. Redirecionando para login...');
+        error.status = response.status;
+        error.body = responseBody;
+        throw error;
+      }
+
       const errorMessage = responseBody.message || `Erro ${response.status}`;
       const error = new Error(errorMessage);
       error.status = response.status;
