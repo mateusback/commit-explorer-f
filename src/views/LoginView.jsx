@@ -3,12 +3,14 @@ import { Link, useNavigate } from 'react-router-dom';
 import { GitBranch, Mail, Lock, LogIn } from 'lucide-react';
 import { useAuth } from '../components/auth/AuthContext';
 import { NotificationService } from '../services/NotificationService';
+import GitHubTokenModal from '../components/modals/GitHubTokenModal';
 
 export default function LoginView() {
     const { login } = useAuth();
     const navigate = useNavigate();
     const [form, setForm] = useState({ email: '', password: '' });
     const [loading, setLoading] = useState(false);
+    const [showTokenModal, setShowTokenModal] = useState(false);
 
     useEffect(() => {
         const sessionExpired = sessionStorage.getItem('sessionExpired');
@@ -28,12 +30,31 @@ export default function LoginView() {
         setLoading(true);
         try {
             await login(form);
-            navigate('/dashboard');
+            
+            const githubToken = localStorage.getItem('github_token');
+            const tokenSkipped = localStorage.getItem('github_token_skipped');
+            
+            if (!githubToken && !tokenSkipped) {
+                setShowTokenModal(true);
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             NotificationService.error(err.message || 'Falha no login');
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleSaveToken = async (token) => {
+        localStorage.setItem('github_token', token);
+        NotificationService.success('Token do GitHub salvo com sucesso!');
+        navigate('/dashboard');
+    };
+
+    const handleCloseTokenModal = () => {
+        setShowTokenModal(false);
+        navigate('/dashboard');
     };
 
     return (
@@ -126,6 +147,13 @@ export default function LoginView() {
                     </p>
                 </div>
             </div>
+            
+            {/* GitHub Token Modal */}
+            <GitHubTokenModal 
+                isOpen={showTokenModal}
+                onClose={handleCloseTokenModal}
+                onSave={handleSaveToken}
+            />
         </div>
     );
 }

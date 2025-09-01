@@ -53,7 +53,7 @@ export const router = createBrowserRouter([
           {
             path: '/projects',
             element: <ProjectsView />,
-            handle: withMeta('Gerenciar Projetos dos Alunos', 'Navegue e selecione projetos individuais para análise detalhada.'),
+            handle: withMeta('Gerenciar Projetos', 'Navegue e selecione projetos individuais para análise detalhada.'),
           },
           {
             path: '/projects/:idProjeto',

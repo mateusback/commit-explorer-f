@@ -2,7 +2,13 @@ import BaseHttpClient from './BaseHttpClient';
 import APIRoutes from '../constants/ApiRoutes';
 
 export function analyzeRepositories(payload) {
-  return BaseHttpClient.post(APIRoutes.ANALYZE_REPOSITORIES, payload);
+  const githubToken = localStorage.getItem('github_token');
+  const enhancedPayload = {
+    ...payload,
+    ...(githubToken && { githubToken })
+  };
+  
+  return BaseHttpClient.post(APIRoutes.ANALYZE_REPOSITORIES, enhancedPayload);
 }
 
 export function fetchAnalysisById(id) {

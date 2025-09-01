@@ -1,108 +1,96 @@
 import React from 'react';
-import { BarChart3, TrendingUp, Code, Clock, Users, FileText, AlertTriangle, Star } from 'lucide-react';
+import { BarChart3, TrendingUp, Code, Clock, Users, FileText, AlertTriangle, Star, LineChart, Activity } from 'lucide-react';
 
 export default function MetricsView() {
     const metrics = [
         {
-            icon: <BarChart3 className="text-blue-600" />,
-            title: "Pontuação Total",
-            description: "Métrica agregada que considera qualidade do código, frequência de commits, complexidade e code smells para gerar uma pontuação geral do projeto.",
-            calculation: "Baseada em algoritmos de análise que ponderam diferentes aspectos da qualidade do desenvolvimento."
+            icon: <Star className="text-emerald-600" />,
+            title: "Pontuação de Qualidade",
+            description: "Avaliação geral que considera qualidade do código, frequência de commits e boas práticas de desenvolvimento.",
+            benefit: "Permite identificar o nível de maturidade do projeto e áreas de melhoria."
         },
         {
-            icon: <Users className="text-emerald-600" />,
-            title: "Total de Autores",
-            description: "Contagem única de desenvolvedores que contribuíram com commits no período analisado.",
-            calculation: "Agrupamento por ID único do autor, filtrando commits sem autor definido."
-        },
-        {
-            icon: <TrendingUp className="text-violet-600" />,
-            title: "Total de Commits",
-            description: "Número total de commits realizados no período de análise especificado.",
-            calculation: "Filtragem de commits entre data de início e fim, incluindo commits no período estabelecido."
+            icon: <Users className="text-blue-600" />,
+            title: "Colaboradores Ativos",
+            description: "Número de desenvolvedores únicos que contribuíram com o projeto no período analisado.",
+            benefit: "Mostra o engajamento da equipe e distribuição de responsabilidades."
         },
         {
             icon: <Code className="text-sky-600" />,
-            title: "Linhas Adicionadas/Removidas",
-            description: "Soma das linhas de código adicionadas e removidas em todos os arquivos alterados.",
-            calculation: "Agregação das quantidades de linhas por arquivo alterado em cada commit do período."
+            title: "Atividade de Desenvolvimento",
+            description: "Volume de código modificado, incluindo linhas adicionadas e removidas por cada desenvolvedor.",
+            benefit: "Indica a produtividade e o nível de atividade da equipe."
         },
         {
             icon: <AlertTriangle className="text-amber-600" />,
-            title: "Code Smells",
-            description: "Quantidade de problemas de qualidade de código detectados através de análise estática.",
-            calculation: "Contagem de análises de código do tipo 'SMELL' encontradas nos arquivos alterados."
+            title: "Problemas de Qualidade",
+            description: "Identificação automática de padrões problemáticos no código que podem impactar a manutenibilidade.",
+            benefit: "Ajuda a prevenir bugs e facilita futuras modificações no código."
         },
         {
-            icon: <Star className="text-green-600" />,
-            title: "Complexidade Média",
-            description: "Média da complexidade geral dos commits, indicando a dificuldade das alterações realizadas.",
-            calculation: "Média aritmética da complexidade geral de todos os commits no período analisado."
+            icon: <Activity className="text-green-600" />,
+            title: "Complexidade do Código",
+            description: "Análise da complexidade média dos commits, indicando a dificuldade de compreensão e manutenção.",
+            benefit: "Orienta decisões sobre refatoração e simplificação do código."
         },
         {
             icon: <Clock className="text-indigo-600" />,
-            title: "Distribuição Horária",
-            description: "Análise dos horários em que os commits são realizados, divididos em buckets de 24 horas.",
-            calculation: "Agrupamento de commits por hora do dia (0-23h) para identificar padrões de trabalho."
-        },
-        {
-            icon: <FileText className="text-teal-600" />,
-            title: "Top Arquivos Modificados",
-            description: "Ranking dos arquivos mais alterados baseado na soma de linhas adicionadas e removidas.",
-            calculation: "Ordenação decrescente por quantidade total de alterações, limitado aos top 6 arquivos."
+            title: "Padrões de Trabalho",
+            description: "Análise dos horários de desenvolvimento para identificar padrões de produtividade da equipe.",
+            benefit: "Oferece insights sobre o ritmo de trabalho e pode indicar sobrecarga."
         }
     ];
 
     const chartTypes = [
         {
-            title: "Frequência de Commits",
-            description: "Gráfico de linha mostrando a distribuição temporal de commits por dia no período analisado."
+            icon: <LineChart className="text-blue-500" />,
+            title: "Evolução no Tempo",
+            description: "Visualização da frequência de commits ao longo do período, mostrando tendências de atividade.",
+            value: "Identifica picos de atividade e períodos de menor produtividade."
         },
         {
-            title: "Distribuição Horária",
-            description: "Gráfico de barras com a quantidade de commits por hora do dia (00:00 - 23:00)."
+            icon: <BarChart3 className="text-purple-500" />,
+            title: "Distribuição por Horário",
+            description: "Mostra em quais horários a equipe é mais produtiva durante o dia.",
+            value: "Ajuda a entender os padrões de trabalho e otimizar reuniões."
         },
         {
-            title: "Top Arquivos",
-            description: "Ranking dos arquivos mais modificados, ordenados por quantidade de linhas alteradas."
+            icon: <TrendingUp className="text-green-500" />,
+            title: "Arquivos Mais Modificados",
+            description: "Ranking dos arquivos que recebem mais alterações, indicando pontos críticos do sistema.",
+            value: "Identifica componentes que podem precisar de refatoração."
         },
         {
-            title: "Tipos de Commit",
-            description: "Distribuição dos commits por tipo (feat, fix, docs, etc.) com ranking decrescente."
+            icon: <FileText className="text-amber-500" />,
+            title: "Tipos de Mudanças",
+            description: "Categorização dos commits por tipo (funcionalidade, correção, melhoria, etc.).",
+            value: "Mostra como o tempo da equipe está sendo investido."
         }
     ];
 
     return (
         <div className="space-y-6">
-            {/* Header */}
-            <section className="bg-white p-6 rounded-xl shadow-lg">
-                <h3 className="text-xl font-semibold text-emerald-600 mb-4">Análise de Métricas Globais</h3>
-                <p className="text-stone-600">
-                    Esta página apresenta o detalhamento das métricas agregadas utilizadas para avaliar a qualidade 
-                    e atividade de desenvolvimento em todos os projetos analisados pelo Commit Explorer.
-                </p>
-            </section>
 
-            {/* Métricas Principais */}
-            <section className="bg-white p-6 rounded-xl shadow-lg">
-                <h4 className="text-lg font-medium text-stone-800 mb-6 flex items-center gap-2">
-                    <BarChart3 className="w-5 h-5 text-emerald-600" />
-                    Métricas Calculadas
-                </h4>
+            {/* Indicadores Principais */}
+            <section className="bg-white rounded-xl shadow-sm ring-1 ring-stone-100 p-8">
+                <h2 className="text-2xl font-bold text-stone-800 mb-6 flex items-center gap-3">
+                    <BarChart3 className="w-6 h-6 text-emerald-600" />
+                    Principais Indicadores
+                </h2>
                 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-6 lg:grid-cols-2">
                     {metrics.map((metric, index) => (
-                        <div key={index} className="p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
-                            <div className="flex items-start gap-3">
-                                <div className="flex-shrink-0">
+                        <div key={index} className="group p-6 border-2 border-stone-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50/30 transition-all duration-200">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 bg-stone-100 group-hover:bg-emerald-100 rounded-xl flex items-center justify-center transition-colors">
                                     {React.cloneElement(metric.icon, { className: "w-6 h-6" })}
                                 </div>
                                 <div className="flex-1">
-                                    <h5 className="font-medium text-stone-800 mb-2">{metric.title}</h5>
-                                    <p className="text-stone-600 text-sm mb-3">{metric.description}</p>
-                                    <div className="bg-stone-50 p-3 rounded border border-stone-100">
-                                        <p className="text-xs text-stone-500 font-medium mb-1">Cálculo:</p>
-                                        <p className="text-xs text-stone-600">{metric.calculation}</p>
+                                    <h3 className="font-bold text-stone-800 mb-3 text-lg">{metric.title}</h3>
+                                    <p className="text-stone-600 mb-4 leading-relaxed">{metric.description}</p>
+                                    <div className="bg-emerald-50 border border-emerald-200 rounded-lg p-4">
+                                        <p className="text-xs font-semibold text-emerald-700 mb-2 uppercase tracking-wide">Por que é importante:</p>
+                                        <p className="text-sm text-emerald-800 leading-relaxed">{metric.benefit}</p>
                                     </div>
                                 </div>
                             </div>
@@ -111,60 +99,69 @@ export default function MetricsView() {
                 </div>
             </section>
 
-            {/* Tipos de Gráficos */}
-            <section className="bg-white p-6 rounded-xl shadow-lg">
-                <h4 className="text-lg font-medium text-stone-800 mb-6 flex items-center gap-2">
-                    <TrendingUp className="w-5 h-5 text-emerald-600" />
-                    Visualizações e Gráficos
-                </h4>
+            {/* Visualizações */}
+            <section className="bg-white rounded-xl shadow-sm ring-1 ring-stone-100 p-8">
+                <h2 className="text-2xl font-bold text-stone-800 mb-6 flex items-center gap-3">
+                    <TrendingUp className="w-6 h-6 text-emerald-600" />
+                    Gráficos e Análises Visuais
+                </h2>
                 
-                <div className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-6 md:grid-cols-2">
                     {chartTypes.map((chart, index) => (
-                        <div key={index} className="p-4 border border-stone-200 rounded-lg hover:bg-stone-50 transition-colors">
-                            <h5 className="font-medium text-stone-800 mb-2">{chart.title}</h5>
-                            <p className="text-stone-600 text-sm">{chart.description}</p>
+                        <div key={index} className="group p-6 border-2 border-stone-200 rounded-xl hover:border-blue-300 hover:bg-blue-50/30 transition-all duration-200">
+                            <div className="flex items-start gap-4">
+                                <div className="w-12 h-12 bg-stone-100 group-hover:bg-blue-100 rounded-xl flex items-center justify-center transition-colors">
+                                    {chart.icon}
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-bold text-stone-800 mb-3 text-lg">{chart.title}</h3>
+                                    <p className="text-stone-600 mb-4 leading-relaxed">{chart.description}</p>
+                                    <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+                                        <p className="text-xs font-semibold text-blue-700 mb-2 uppercase tracking-wide">Benefício:</p>
+                                        <p className="text-sm text-blue-800 leading-relaxed">{chart.value}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     ))}
                 </div>
             </section>
 
-            {/* Metodologia */}
-            <section className="bg-white p-6 rounded-xl shadow-lg">
-                <h4 className="text-lg font-medium text-stone-800 mb-6 flex items-center gap-2">
-                    <Code className="w-5 h-5 text-emerald-600" />
-                    Metodologia de Análise
-                </h4>
+            {/* Como usar as informações */}
+            <section className="bg-white rounded-xl shadow-sm ring-1 ring-stone-100 p-8">
+                <h2 className="text-2xl font-bold text-stone-800 mb-6 flex items-center gap-3">
+                    <Activity className="w-6 h-6 text-emerald-600" />
+                    Como Interpretar os Resultados
+                </h2>
                 
-                <div className="space-y-4">
-                    <div className="border-l-4 border-emerald-500 pl-4 bg-emerald-50 p-3 rounded-r">
-                        <h5 className="font-medium text-stone-800 mb-2">Período de Análise</h5>
-                        <p className="text-stone-600 text-sm">
-                            Os commits são filtrados considerando o período especificado na solicitação de análise, 
-                            incluindo commits entre a data de início (00:00:00) e data fim (23:59:59).
+                <div className="grid gap-6 md:grid-cols-3">
+                    <div className="p-6 bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-xl">
+                        <div className="w-12 h-12 bg-green-500 rounded-xl flex items-center justify-center mb-4">
+                            <TrendingUp className="w-6 h-6 text-white" />
+                        </div>
+                        <h4 className="font-bold text-green-800 mb-3">Pontuação Alta</h4>
+                        <p className="text-green-700 text-sm leading-relaxed">
+                            Indica um projeto bem estruturado, com boa qualidade de código e práticas consistentes de desenvolvimento.
                         </p>
                     </div>
                     
-                    <div className="border-l-4 border-sky-500 pl-4 bg-sky-50 p-3 rounded-r">
-                        <h5 className="font-medium text-stone-800 mb-2">Agrupamento por Autor</h5>
-                        <p className="text-stone-600 text-sm">
-                            As métricas são calculadas tanto globalmente quanto agrupadas por autor único, 
-                            permitindo análises individuais e comparativas entre desenvolvedores.
+                    <div className="p-6 bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-xl">
+                        <div className="w-12 h-12 bg-amber-500 rounded-xl flex items-center justify-center mb-4">
+                            <AlertTriangle className="w-6 h-6 text-white" />
+                        </div>
+                        <h4 className="font-bold text-amber-800 mb-3">Pontos de Atenção</h4>
+                        <p className="text-amber-700 text-sm leading-relaxed">
+                            Métricas médias podem indicar oportunidades de melhoria na organização do código ou processos da equipe.
                         </p>
                     </div>
                     
-                    <div className="border-l-4 border-amber-500 pl-4 bg-amber-50 p-3 rounded-r">
-                        <h5 className="font-medium text-stone-800 mb-2">Tratamento de Dados</h5>
-                        <p className="text-stone-600 text-sm">
-                            Implementação de funções seguras para tratar valores nulos, listas vazias e 
-                            garantir a integridade dos cálculos estatísticos realizados.
-                        </p>
-                    </div>
-                    
-                    <div className="border-l-4 border-violet-500 pl-4 bg-violet-50 p-3 rounded-r">
-                        <h5 className="font-medium text-stone-800 mb-2">Ranking e Ordenação</h5>
-                        <p className="text-stone-600 text-sm">
-                            Os dados são ordenados de forma decrescente por relevância (ex: autores por número de commits, 
-                            arquivos por quantidade de alterações) para facilitar a identificação de padrões.
+                    <div className="p-6 bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-xl">
+                        <div className="w-12 h-12 bg-blue-500 rounded-xl flex items-center justify-center mb-4">
+                            <Users className="w-6 h-6 text-white" />
+                        </div>
+                        <h4 className="font-bold text-blue-800 mb-3">Colaboração</h4>
+                        <p className="text-blue-700 text-sm leading-relaxed">
+                            Analise a distribuição de trabalho entre os membros da equipe para identificar sobrecargas ou oportunidades de mentoria.
                         </p>
                     </div>
                 </div>

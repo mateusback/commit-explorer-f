@@ -1,10 +1,15 @@
 import React from 'react';
+import GitHubTokenSettings from '../components/settings/GitHubTokenSettings';
 
 export default function SettingsView() {
     return (
-        <section className="bg-white p-6 rounded-xl shadow-lg">
-            <h3 className="text-xl font-semibold text-emerald-600 mb-4">Configurações da Aplicação</h3>
-            <p className="text-stone-600">Configure o Commit Explorer, gerencie integrações, papéis de usuário e preferências de notificação.</p>
-        </section>
+        <div className="space-y-6">
+            <section className="bg-white p-6 rounded-xl shadow-sm ring-1 ring-stone-100">
+                <h3 className="text-2xl font-semibold text-stone-800 mb-2">Configurações</h3>
+                <p className="text-stone-600">Configure o Commit Explorer, gerencie integrações e preferências.</p>
+            </section>
+            
+            <GitHubTokenSettings />
+        </div>
     );
 }

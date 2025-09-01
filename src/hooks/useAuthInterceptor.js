@@ -15,10 +15,8 @@ export function useAuthInterceptor() {
   const { logout } = useAuth();
 
   useEffect(() => {
-    // Registrar a função de logout globalmente
     setGlobalLogout(logout);
 
-    // Cleanup ao desmontar
     return () => {
       setGlobalLogout(null);
     };
