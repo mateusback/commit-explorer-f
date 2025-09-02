@@ -133,7 +133,7 @@ export default function RegisterView() {
                 {/* Footer */}
                 <div className="text-center mt-8">
                     <p className="text-sm text-stone-500">
-                        © 2024 Commit Explorer. Todos os direitos reservados.
+                        © 2025 Commit Explorer.
                     </p>
                 </div>
             </div>

@@ -5,6 +5,7 @@ const colorVariants = {
   violet: 'text-violet-600 bg-violet-50 ring-violet-100',
   sky: 'text-sky-600 bg-sky-50 ring-sky-100',
   amber: 'text-amber-600 bg-amber-50 ring-amber-100',
+  red: 'text-red-600 bg-red-50 ring-red-100',
 };
 
 export default function StatSummaryCard({ icon, title, value, description, color, onClick }) {

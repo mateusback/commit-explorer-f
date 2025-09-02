@@ -6,10 +6,10 @@ const authRoute = '/auth';
 
 const APIRoutes = {
   ANALYZE_REPOSITORIES: `${gitRoute}/analyze`,
+  FETCH_REQUESTS: `${analysisRoute}/solicitacoes`,
   LIST_PROJECTS: `${projectsRoute}/list`,
   LIST_PROJECT_ANALYSIS: `${projectsRoute}/analysis`,
   GET_COMMIT_BY_ID: (idCommit) => `${commitRoute}/${idCommit}`,
-  GET_ANALYSIS_BY_ID: (idAnalysis) => `${analysisRoute}/${idAnalysis}`,
   AUTH_LOGIN: `${authRoute}/login`,
   AUTH_REGISTER: `${authRoute}/signup`,
 };

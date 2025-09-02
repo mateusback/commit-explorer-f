@@ -1,8 +1,11 @@
 import React, { useMemo, useState, useEffect } from 'react';
 import { PlusCircle, PlayCircle, Loader2, GitBranch, Clock, AlertTriangle, GitFork, Settings } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import RepoInputGroup from '../components/input/RepoInputGroup';
 import GitHubTokenModal from '../components/modals/GitHubTokenModal';
+import SuccessModal from '../components/modals/SuccessModal';
 import { useGitHubToken } from '../hooks/useGitHubToken';
+import { useSuccessModal } from '../hooks/useSuccessModal';
 import { analyzeRepositories } from '../services/AnalysisService';
 import { NotificationService } from '../services/NotificationService';
 
@@ -41,7 +44,9 @@ export default function AnalyzeView() {
   const [loading, setLoading] = useState(false);
   const [showTokenModal, setShowTokenModal] = useState(false);
   
+  const navigate = useNavigate();
   const { hasToken, saveToken } = useGitHubToken();
+  const { modalState, showAnalysisSuccess, hideSuccess } = useSuccessModal();
 
   useEffect(() => {
     if (!hasToken && !localStorage.getItem('github_token_skipped')) {
@@ -105,7 +110,18 @@ export default function AnalyzeView() {
 
     try {
       await analyzeRepositories(payload);
-      NotificationService.success('Análise iniciada com sucesso!');
+      
+      showAnalysisSuccess(() => {
+        navigate('/projects');
+        hideSuccess();
+      });
+      
+      setProjectName('');
+      setStartDate('');
+      setEndDate('');
+      setProjectLink('');
+      setRepositories([{ url: '', branch: 'main' }]);
+      
     } catch (err) {
       NotificationService.error(err.message || 'Erro ao analisar repositórios.');
     } finally {
@@ -117,35 +133,20 @@ export default function AnalyzeView() {
     <div className="space-y-6">
 
       {/* Status do Token GitHub */}
-      <div className={`rounded-xl border-2 p-6 ${hasToken 
-        ? 'bg-gradient-to-r from-emerald-50 to-emerald-100 border-emerald-200' 
-        : 'bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200'
-      }`}>
-        <div className="flex items-center gap-4">
-          <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg ${hasToken 
-            ? 'bg-gradient-to-br from-emerald-500 to-emerald-600' 
-            : 'bg-gradient-to-br from-amber-500 to-amber-600'
-          }`}>
-            <GitFork className="w-6 h-6 text-white" />
-          </div>
-          <div className="flex-1">
-            <h3 className={`font-bold ${hasToken 
-              ? 'text-emerald-800' 
-              : 'text-amber-800'
-            }`}>
-              {hasToken ? 'Token GitHub Configurado' : 'Token GitHub Necessário'}
-            </h3>
-            <p className={`text-sm ${hasToken 
-              ? 'text-emerald-700' 
-              : 'text-amber-700'
-            }`}>
-              {hasToken 
-                ? 'Você pode analisar repositórios privados e ter limites de API mais altos.' 
-                : 'Configure seu token para acessar repositórios privados e evitar limites de API.'
-              }
-            </p>
-          </div>
-          {!hasToken && (
+      {!hasToken && (
+        <div className="rounded-xl border-2 p-6 bg-gradient-to-r from-amber-50 to-amber-100 border-amber-200">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-xl flex items-center justify-center shadow-lg bg-gradient-to-br from-amber-500 to-amber-600">
+              <GitFork className="w-6 h-6 text-white" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-bold text-amber-800">
+                Token GitHub Necessário
+              </h3>
+              <p className="text-sm text-amber-700">
+                Configure seu token para acessar repositórios privados e evitar limites de API.
+              </p>
+            </div>
             <button
               onClick={() => setShowTokenModal(true)}
               className="bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all duration-200 flex items-center gap-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
@@ -153,9 +154,9 @@ export default function AnalyzeView() {
               <Settings className="w-4 h-4" />
               Configurar
             </button>
-          )}
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Formulário Principal */}
       <section className="bg-white rounded-2xl shadow-xl border border-stone-100 ring-1 ring-stone-50">
@@ -309,6 +310,18 @@ export default function AnalyzeView() {
         isOpen={showTokenModal}
         onClose={() => setShowTokenModal(false)}
         onSave={saveToken}
+      />
+
+      {/* Modal de Sucesso */}
+      <SuccessModal
+        isOpen={modalState.isOpen}
+        onClose={hideSuccess}
+        title={modalState.title}
+        message={modalState.message}
+        actionText={modalState.actionText}
+        onAction={modalState.onAction}
+        autoClose={modalState.autoClose}
+        autoCloseDelay={modalState.autoCloseDelay}
       />
     </div>
   );

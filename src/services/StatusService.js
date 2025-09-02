@@ -1,0 +1,37 @@
+import BaseHttpClient from './BaseHttpClient';
+import APIRoutes from '../constants/ApiRoutes';
+
+const StatusService = {
+  async fetchAnalysisStatus() {
+    try {
+      const response = await BaseHttpClient.get(APIRoutes.FETCH_REQUESTS);
+      
+      if (response?.solicitacoes) {
+        return response.solicitacoes.map(solicitacao => ({
+          id: solicitacao.id || Math.random(),
+          projectName: solicitacao.nomeProjeto,
+          status: solicitacao.status,
+          createdAt: solicitacao.dataSolicitacao,
+          startDate: solicitacao.dataInicio,
+          endDate: solicitacao.dataFim,
+          repositoryUrl: solicitacao.repositorioUrl,
+          branch: solicitacao.branch,
+          projectUrl: solicitacao.projetoUrl,
+          errorMessage: solicitacao.mensagemErro,
+          repositories: [{
+            url: solicitacao.repositorioUrl,
+            branch: solicitacao.branch
+          }],
+          repositoryCount: 1
+        }));
+      }
+      
+      return [];
+    } catch (error) {
+      console.error('Erro ao buscar status das análises:', error);
+      throw error;
+    }
+  }
+};  
+
+export default StatusService;

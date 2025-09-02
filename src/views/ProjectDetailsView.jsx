@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjectAnalyses } from '../services/ProjectService';
 import {
@@ -184,9 +184,8 @@ export default function ProjectDetailsView() {
           <ul className="space-y-6">
             {analises.map((a, idx) => (
               console.log(a),
-              <Link key={a.id || idx} to={`/analise/${a.id}`}>
-                <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
-                  <div className="p-6 flex flex-col lg:flex-row items-center gap-6">
+              <li key={a.id || idx} className="bg-white rounded-xl shadow-lg overflow-hidden">
+                <div className="p-6 flex flex-col lg:flex-row items-center gap-6">
                     <div className="flex-shrink-0 flex flex-col items-center">
                       <ScoreGauge score={a.pontuacaoTotal} />
                       <p className="mt-2 text-sm font-medium text-stone-600">Pontuação de Qualidade</p>
@@ -224,7 +223,6 @@ export default function ProjectDetailsView() {
                     </div>
                   </div>
                 </li>
-              </Link>
             ))}
           </ul>
         )}

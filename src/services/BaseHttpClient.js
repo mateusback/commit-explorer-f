@@ -47,7 +47,6 @@ async function request(method, url, data = null, customHeaders = {}) {
     const responseBody = await response.json().catch(() => ({}));
 
     if (!response.ok) {
-      // Se for erro 401, fazer logout automático
       if (response.status === 401) {
         handleUnauthorized();
         

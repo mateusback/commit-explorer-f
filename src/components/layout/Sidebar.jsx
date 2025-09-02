@@ -12,7 +12,8 @@ import {
   LogOut,
   GitBranch,
   Menu,
-  X
+  X,
+  Activity
 } from 'lucide-react';
 
 const Sidebar = () => {
@@ -30,6 +31,7 @@ const Sidebar = () => {
   const navItems = [
     { path: '/dashboard', label: 'Visão Geral', icon: <LayoutDashboard /> },
     { path: '/analyze', label: 'Analisar Repositório', icon: <SearchCode /> },
+    { path: '/status', label: 'Status das Análises', icon: <Activity /> },
     { path: '/projects', label: 'Projetos', icon: <FolderGit2 /> },
     { path: '/commits', label: 'Todos os Commits', icon: <GitCommit /> },
     { path: '/metrics', label: 'Métricas Globais', icon: <BarChart3 /> },

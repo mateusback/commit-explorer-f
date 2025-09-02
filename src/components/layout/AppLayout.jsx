@@ -20,7 +20,7 @@ export default function AppLayout() {
         <Header title={meta.title} subtitle={meta.subtitle} />
         <Outlet />
         <footer className="mt-8 text-center text-sm text-stone-400 print:hidden">
-          Commit Explorer &copy; 2024
+          Commit Explorer &copy; 2025
         </footer>
       </main>
     </div>
