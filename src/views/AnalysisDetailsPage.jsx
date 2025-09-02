@@ -2,7 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Award, TrendingUp, Code, Users } from 'lucide-react';
-
+import { fetchAnalysisById } from '../services/AnalysisService';
 import StatSummaryCard from '../components/ui/StatSummaryCard';
 import CommitFrequencyChart from '../components/analysis/CommitFrequencyChart';
 import HourlyDistributionChart from '../components/analysis/HourlyDistributionChart';

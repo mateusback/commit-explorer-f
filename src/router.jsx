@@ -16,6 +16,7 @@ import CommitDetailsView from './views/CommitDetailsView';
 import MetricsView from './views/MetricsView';
 import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
+import AnalysisDetailsPage from './views/AnalysisDetailsPage';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 
@@ -89,6 +90,11 @@ export const router = createBrowserRouter([
             path: '/settings',
             element: <SettingsView />,
             handle: withMeta('Configurações da Aplicação', 'Configure o Commit Explorer, integrações e preferências.'),
+          },
+          {
+            path: '/analise/:analysisId',
+            element: <AnalysisDetailsPage />,
+            handle: withMeta('Detalhes da Análise', 'Resultados completos da análise solicitada.'),
           },
           { path: '*', element: <Navigate to="/dashboard" replace /> },
         ],

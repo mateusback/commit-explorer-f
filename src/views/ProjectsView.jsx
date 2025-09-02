@@ -5,9 +5,11 @@ import { Loader2, FolderGit2, Plus, SearchCode, GitBranch } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { TimeConstants } from '../constants/TimeConstants';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 
 export default function ProjectsView() {
+  const navigate = useNavigate();
+  
   const {
     data: projects,
     isLoading,
@@ -135,7 +137,7 @@ export default function ProjectsView() {
           <div
             key={proj.idProjeto}
             className="group p-4 border-2 border-stone-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50/50 cursor-pointer transition-all duration-200"
-            onClick={() => window.location.href = `/projects/${proj.idProjeto}`}
+            onClick={() => navigate(`/projects/${proj.idProjeto}`)}
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-emerald-100 group-hover:bg-emerald-200 rounded-lg flex items-center justify-center transition-colors">
