@@ -6,8 +6,10 @@ const StatusService = {
     try {
       const response = await BaseHttpClient.get(APIRoutes.FETCH_REQUESTS);
       
-      if (response?.solicitacoes) {
-        return response.solicitacoes.map(solicitacao => ({
+      const solicitacoes = response?.solicitacoes || response || [];
+      
+      if (Array.isArray(solicitacoes)) {
+        return solicitacoes.map(solicitacao => ({
           id: solicitacao.id || Math.random(),
           projectName: solicitacao.nomeProjeto,
           status: solicitacao.status,
