@@ -26,11 +26,14 @@ export default function AnalysisDetailsPage() {
     queryFn: () => fetchAnalysisDetails(analysisId),
   });
 
-  const displayedData = useMemo(() => {
-    if (!data) return null;
-    if (activeTab === 'geral') return data.geral;
-    return data.porAutor?.[activeTab] || null;
-  }, [data, activeTab]);
+    const analysisData = data || null;
+    const displayedData = useMemo(() => {
+      if (!analysisData) return null;
+      if (activeTab === 'geral') return analysisData.geral;
+      
+      const autorData = analysisData.autores?.find(autor => String(autor.idAutor) === activeTab);
+      return autorData || null;
+    }, [analysisData, activeTab]);
 
   if (isLoading) {
     return <div className="flex justify-center items-center h-screen">
@@ -38,14 +41,22 @@ export default function AnalysisDetailsPage() {
     </div>;
   }
 
-  if (error || !data) {
-    return <div className="text-center text-red-500 p-8">
-      Erro ao carregar a análise: {error?.message || 'Dados não encontrados.'}
-    </div>;
-  }
+    if (error || !analysisData) {
+      return <div className="text-center text-red-500 p-8">
+        Erro ao carregar a análise: {error?.message || 'Dados não encontrados.'}
+      </div>;
+    }
 
-  const { pontuacaoTotal, totalCommits, quantidadeCodeSmells, complexidadeMedia, commits, charts } = displayedData || {};
-  const chartsData = charts?.[0];
+    const isGeneralTab = activeTab === 'geral';
+    const { 
+      feedback,
+      pontuacaoTotal = feedback?.pontuacaoGeral, 
+      totalCommits, 
+      quantidadeCodeSmells, 
+      complexidadeMedia, 
+      commits, 
+      charts 
+    } = displayedData || {};
 
   return (
     <div className="p-4 md:p-8 bg-base-200 min-h-screen">
@@ -53,27 +64,27 @@ export default function AnalysisDetailsPage() {
 
         {/* Cabeçalho */}
         <div className="mb-8">
-          <AnalysisHeader
-            projectName={data.geral?.nomeProjeto || 'Projeto Não Identificado'}
-            repoUrl={data.geral?.urlRepositorio || 'Url do Repositório'}
-            branchName={data.geral?.branch || 'Branch Não Identificada'}
-            startDate={data.geral?.dataInicio || 'Data de Início'}
-            endDate={data.geral?.dataFim || 'Data de Fim'}
-            projectId={data.geral?.idProjeto}
-          />
+            <AnalysisHeader
+              projectName={analysisData.geral?.nomeProjeto || 'Projeto Não Identificado'}
+              repoUrl={analysisData.geral?.urlRepositorio || 'Url do Repositório'}
+              branchName={analysisData.geral?.branch || 'Branch Não Identificada'}
+              startDate={analysisData.geral?.dataInicio || 'Data de Início'}
+              endDate={analysisData.geral?.dataFim || 'Data de Fim'}
+              projectId={analysisData.geral?.idProjeto}
+            />
         </div>
 
         {/* Tabs para seleção */}
-        <AuthorTabs
-          value={activeTab}
-          onChange={setActiveTab}
-          autores={data.autores}
-          geralStats={{
-            totalCommits: data.geral?.totalCommits,
-            quantidadeCodeSmells: data.geral?.quantidadeCodeSmells,
-            pontuacaoTotal: data.geral?.pontuacaoTotal,
-          }}
-        />
+          <AuthorTabs
+            value={activeTab}
+            onChange={setActiveTab}
+            autores={analysisData.autores}
+            geral={{
+              totalCommits: analysisData.geral?.totalCommits,
+              quantidadeCodeSmells: analysisData.geral?.quantidadeCodeSmells,
+              pontuacaoTotal: analysisData.geral?.pontuacaoTotal,
+            }}
+          />
 
         {/* Conteúdo da aba */}
         {displayedData ? (
@@ -86,17 +97,13 @@ export default function AnalysisDetailsPage() {
               <StatSummaryCard title="Complexidade Média" value={complexidadeMedia?.toFixed(1) ?? 0} icon={<Users />} color='violet' />
             </div>
 
-            {/* Gráficos */}
-            {chartsData ? (
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
-                <CommitFrequencyChart data={chartsData.frequenciaCommits} />
-                <HourlyDistributionChart data={chartsData.distribuicaoHorarios} />
-                <TopFilesChart data={chartsData.topArquivos} />
-                <CommitTypesChart data={chartsData.tipoCommits} />
-              </div>
-            ) : (
-              <p className="text-center text-stone-500">Não há dados de gráfico para esta seleção.</p>
-            )}
+            {/* Gráficos - agora direto dos objetos */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
+              <CommitFrequencyChart data={charts?.frequenciaCommits} />
+              <HourlyDistributionChart data={charts?.distribuicaoHorarios} />
+              <TopFilesChart data={charts?.topArquivos} />
+              <CommitTypesChart data={charts?.tipoCommits} />
+            </div>
 
             {/* Tabela de commits */}
             {commits ? (
@@ -105,11 +112,17 @@ export default function AnalysisDetailsPage() {
               <p className="text-center text-stone-500">Não há commits para esta seleção.</p>
             )}
 
-            {/* Avaliação só na aba geral */}
-            {activeTab === 'geral' && (
+            {/* Avaliação: mostra na aba geral e para cada autor se houver feedback */}
+            {(activeTab === 'geral' && analysisData?.feedback) && (
               <EvaluationSection
-                score={data.geral?.pontuacaoTotal}
-                feedbackData={data?.feedback}
+                score={analysisData.geral?.pontuacaoTotal}
+                feedbackData={analysisData.feedback}
+              />
+            )}
+            {(activeTab !== 'geral' && displayedData?.feedback) && (
+              <EvaluationSection
+                score={displayedData?.pontuacaoGeral || pontuacaoTotal}
+                feedbackData={displayedData.feedback}
               />
             )}
           </>

@@ -33,6 +33,16 @@ const StatusService = {
       console.error('Erro ao buscar status das análises:', error);
       throw error;
     }
+  },
+
+  async retryAnalysis(analysisId) {
+    try {
+      const response = await BaseHttpClient.patch(APIRoutes.RETRY_ANALYSIS(analysisId));
+      return response;
+    } catch (error) {
+      console.error('Erro ao reenviar análise:', error);
+      throw error;
+    }
   }
 };  
 

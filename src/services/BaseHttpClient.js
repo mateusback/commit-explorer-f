@@ -94,6 +94,7 @@ const BaseHttpClient = {
   get: (url, headers) => request('GET', url, null, headers),
   post: (url, data, headers) => request('POST', url, data, headers),
   put: (url, data, headers) => request('PUT', url, data, headers),
+  patch: (url, data, headers) => request('PATCH', url, data, headers),
   del: (url, headers) => request('DELETE', url, null, headers),
   setAuthToken,
   
