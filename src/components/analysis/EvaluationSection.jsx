@@ -342,16 +342,32 @@ export default function EvaluationSection({score, feedbackData}) {
                             <div className="w-2 h-2 bg-indigo-500 rounded-full mr-2"></div>
                             Qualidade Técnica
                           </span>
-                          <span className={`text-sm font-bold px-2 py-1 rounded-md ${getScoreColor(pontuacaoQualidadeTecnica)} bg-stone-50`}>
-                            {pontuacaoQualidadeTecnica.toFixed(1)}%
-                          </span>
+                          {pontuacaoQualidadeTecnica === null ? (
+                            <span className="text-sm font-medium px-2 py-1 rounded-md text-stone-500 bg-stone-100 italic">
+                              Desconsiderado
+                            </span>
+                          ) : (
+                            <span className={`text-sm font-bold px-2 py-1 rounded-md ${getScoreColor(pontuacaoQualidadeTecnica)} bg-stone-50`}>
+                              {pontuacaoQualidadeTecnica.toFixed(1)}%
+                            </span>
+                          )}
                         </div>
-                        <div className="w-full bg-stone-200 rounded-full h-2 shadow-inner">
-                          <div 
-                            className={`h-2 rounded-full ${getScoreBarColor(pontuacaoQualidadeTecnica)} shadow-sm transition-all duration-300`}
-                            style={{ width: `${Math.min(pontuacaoQualidadeTecnica, 100)}%` }}
-                          ></div>
-                        </div>
+                        {pontuacaoQualidadeTecnica !== null ? (
+                          <div className="w-full bg-stone-200 rounded-full h-2 shadow-inner">
+                            <div 
+                              className={`h-2 rounded-full ${getScoreBarColor(pontuacaoQualidadeTecnica)} shadow-sm transition-all duration-300`}
+                              style={{ width: `${Math.min(pontuacaoQualidadeTecnica, 100)}%` }}
+                            ></div>
+                          </div>
+                        ) : (
+                          <div className="w-full bg-stone-200 rounded-full h-2 shadow-inner">
+                            <div className="h-2 rounded-full bg-stone-300 shadow-sm" style={{ width: '100%' }}>
+                              <div className="h-full flex items-center justify-center">
+                                <span className="text-[10px] font-medium text-stone-600">N/A</span>
+                              </div>
+                            </div>
+                          </div>
+                        )}
                       </div>
                     )}
                   </div>
