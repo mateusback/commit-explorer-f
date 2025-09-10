@@ -13,11 +13,11 @@ function initials(name = "?") {
 function Avatar({ name, src }) {
   const label = initials(name);
   return (
-    <div className="relative w-8 h-8 rounded-full bg-white/70 ring-1 ring-stone-200 overflow-hidden flex items-center justify-center flex-none">
+    <div className="relative w-10 h-10 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 ring-2 ring-white overflow-hidden flex items-center justify-center flex-none shadow-sm">
       {src ? (
         <img src={src} alt={name} className="w-full h-full object-cover" />
       ) : (
-        <span className="text-[10px] font-semibold text-emerald-700 leading-none">{label}</span>
+        <span className="text-xs font-bold text-emerald-700 leading-none">{label}</span>
       )}
     </div>
   );
@@ -42,10 +42,10 @@ function Pill({ active, onClick, title, children, className = "" }) {
       type="button"
       onClick={onClick}
       title={title}
-      className={`inline-flex items-center gap-3 h-12 px-4 min-w-[180px] max-w-[220px] rounded-full border transition-all flex-none overflow-hidden text-left truncate ${
+      className={`inline-flex items-center gap-3 h-16 px-5 min-w-[220px] max-w-[320px] rounded-2xl border transition-all flex-none overflow-hidden text-left truncate ${
         active
-          ? "bg-emerald-100 border-emerald-300 text-emerald-800 shadow-md"
-          : "bg-white/80 backdrop-blur border-stone-200 text-stone-700 hover:bg-white hover:shadow"
+          ? "bg-emerald-100 border-emerald-300 text-emerald-800 shadow-lg ring-2 ring-emerald-200"
+          : "bg-white/90 backdrop-blur border-stone-200 text-stone-700 hover:bg-white hover:shadow-md hover:border-stone-300"
       } ${className}`}
       role="tab"
       aria-current={active ? "page" : undefined}
@@ -67,6 +67,7 @@ export default function AnalysisScopeTabs({
     const mapped = autores.map((a) => ({
       key: String(a.idAutor),
       label: a.nome,
+      email: a.email,
       commits: a.totalCommits,
       smells: a.quantidadeCodeSmells,
       avatarUrl: a.avatarUrl,
@@ -123,7 +124,7 @@ export default function AnalysisScopeTabs({
           >
             {items.map((it) => (
               <option key={it.key} value={it.key}>
-                {it.label}
+                {it.isGeral ? it.label : `${it.label}${it.email ? ` (${it.email})` : ''}`}
               </option>
             ))}
           </select>
@@ -158,10 +159,13 @@ export default function AnalysisScopeTabs({
                   >
                     {it.isGeral ? (
                       <>
-                        <span className="w-8 h-8 rounded-full bg-emerald-50 ring-1 ring-emerald-200 text-emerald-600 flex items-center justify-center flex-none">
-                          <Sparkles className="w-4 h-4" />
+                        <span className="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-100 to-emerald-50 ring-2 ring-white text-emerald-600 flex items-center justify-center flex-none shadow-sm">
+                          <Sparkles className="w-5 h-5" />
                         </span>
-                        <span className={`text-sm font-semibold truncate ${active ? "text-emerald-800" : "text-stone-800"}`}>{it.label}</span>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className={`text-sm font-semibold truncate ${active ? "text-emerald-800" : "text-stone-800"}`}>{it.label}</span>
+                          <span className={`text-xs truncate ${active ? "text-emerald-600" : "text-stone-500"}`}>Visão geral</span>
+                        </div>
                         <span className="ml-auto hidden xl:flex items-center gap-2 flex-none">
                           <StatChip icon={<GitCommit className="w-3.5 h-3.5" />} value={it.commits} />
                           <StatChip icon={<Users className="w-3.5 h-3.5" />} value={autores.length} />
@@ -170,7 +174,12 @@ export default function AnalysisScopeTabs({
                     ) : (
                       <>
                         <Avatar name={it.label} src={it.avatarUrl} />
-                        <span className={`text-sm font-semibold truncate ${active ? "text-emerald-800" : "text-stone-800"}`}>{it.label}</span>
+                        <div className="flex flex-col min-w-0 flex-1">
+                          <span className={`text-sm font-semibold truncate ${active ? "text-emerald-800" : "text-stone-800"}`}>{it.label}</span>
+                          {it.email && (
+                            <span className={`text-xs truncate ${active ? "text-emerald-600" : "text-stone-500"}`}>{it.email}</span>
+                          )}
+                        </div>
                         <span className="ml-auto hidden xl:flex items-center gap-2 flex-none">
                           <StatChip icon={<GitCommit className="w-3.5 h-3.5" />} value={it.commits} />
                         </span>
