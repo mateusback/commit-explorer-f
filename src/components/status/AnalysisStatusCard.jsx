@@ -6,10 +6,14 @@ import {
   XCircle, 
   Loader2,
   GitBranch,
-  Calendar
+  Calendar,
+  RefreshCw,
+  RotateCcw
 } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import StatusService from '../../services/StatusService';
+import { NotificationService } from '../../services/NotificationService';
 
 const statusConfig = {
   PENDENTE: {
@@ -48,9 +52,25 @@ const statusConfig = {
 
 export default function AnalysisStatusCard({ analysis, onRefresh }) {
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isRetrying, setIsRetrying] = useState(false);
 
   const status = statusConfig[analysis.status] || statusConfig.PENDENTE;
   const StatusIcon = status.icon;
+
+  const handleRetry = async () => {
+    setIsRetrying(true);
+    try {
+      await StatusService.retryAnalysis(analysis.id);
+      NotificationService.success('Análise reenviada com sucesso!');
+      onRefresh();
+    } catch (error) {
+      NotificationService.error(error.message || 'Erro ao reenviar análise');
+    } finally {
+      setIsRetrying(false);
+    }
+  };
+
+  const canRetry = analysis.status === 'FALHA';
 
   return (
     <div className="bg-white rounded-xl shadow-sm ring-1 ring-stone-100 p-6 hover:shadow-md transition-shadow">
@@ -71,6 +91,22 @@ export default function AnalysisStatusCard({ analysis, onRefresh }) {
         </div>
         
         <div className="flex items-center gap-2">
+          {canRetry && (
+            <button
+              onClick={handleRetry}
+              disabled={isRetrying}
+              className="flex items-center gap-2 px-3 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              title="Tentar novamente"
+            >
+              {isRetrying ? (
+                <Loader2 className="w-3 h-3 animate-spin" />
+              ) : (
+                <RotateCcw className="w-3 h-3" />
+              )}
+              {isRetrying ? 'Reenviando...' : 'Tentar novamente'}
+            </button>
+          )}
+          
           <button
             onClick={() => setIsExpanded(!isExpanded)}
             className="p-2 text-stone-600 hover:bg-stone-100 rounded-lg transition-colors"
@@ -143,7 +179,19 @@ export default function AnalysisStatusCard({ analysis, onRefresh }) {
             <div>
               <h4 className="font-semibold text-red-800 mb-2">Erro:</h4>
               <div className="bg-red-50 border border-red-200 rounded-lg p-3">
-                <p className="text-sm text-red-700">{analysis.errorMessage}</p>
+                <p className="text-sm text-red-700 mb-3">{analysis.errorMessage}</p>
+                <button
+                  onClick={handleRetry}
+                  disabled={isRetrying}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isRetrying ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <RefreshCw className="w-4 h-4" />
+                  )}
+                  {isRetrying ? 'Reenviando análise...' : 'Tentar novamente'}
+                </button>
               </div>
             </div>
           )}

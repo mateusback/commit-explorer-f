@@ -6,8 +6,10 @@ const StatusService = {
     try {
       const response = await BaseHttpClient.get(APIRoutes.FETCH_REQUESTS);
       
-      if (response?.solicitacoes) {
-        return response.solicitacoes.map(solicitacao => ({
+      const solicitacoes = response?.solicitacoes || response || [];
+      
+      if (Array.isArray(solicitacoes)) {
+        return solicitacoes.map(solicitacao => ({
           id: solicitacao.id || Math.random(),
           projectName: solicitacao.nomeProjeto,
           status: solicitacao.status,
@@ -29,6 +31,16 @@ const StatusService = {
       return [];
     } catch (error) {
       console.error('Erro ao buscar status das análises:', error);
+      throw error;
+    }
+  },
+
+  async retryAnalysis(analysisId) {
+    try {
+      const response = await BaseHttpClient.patch(APIRoutes.RETRY_ANALYSIS(analysisId));
+      return response;
+    } catch (error) {
+      console.error('Erro ao reenviar análise:', error);
       throw error;
     }
   }

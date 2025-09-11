@@ -56,11 +56,31 @@ async function request(method, url, data = null, customHeaders = {}) {
         throw error;
       }
 
-      const errorMessage = responseBody.message || `Erro ${response.status}`;
+      const errorMessage = responseBody.message || responseBody.errors?.[0] || `Erro ${response.status}`;
       const error = new Error(errorMessage);
       error.status = response.status;
       error.body = responseBody;
+      error.errors = responseBody.errors || [];
+      error.errorCode = responseBody.errorCode;
       throw error;
+    }
+
+    if (responseBody && typeof responseBody === 'object') {
+      if (responseBody.hasOwnProperty('success') && responseBody.hasOwnProperty('data')) {
+        if (responseBody.success) {
+          return responseBody.data;
+        } else {
+          const errorMessage = responseBody.message || responseBody.errors?.[0] || 'Erro desconhecido';
+          const error = new Error(errorMessage);
+          error.status = response.status;
+          error.body = responseBody;
+          error.errors = responseBody.errors || [];
+          error.errorCode = responseBody.errorCode;
+          error.success = false;
+          throw error;
+        }
+      }
+      return responseBody;
     }
 
     return responseBody;
@@ -74,8 +94,34 @@ const BaseHttpClient = {
   get: (url, headers) => request('GET', url, null, headers),
   post: (url, data, headers) => request('POST', url, data, headers),
   put: (url, data, headers) => request('PUT', url, data, headers),
+  patch: (url, data, headers) => request('PATCH', url, data, headers),
   del: (url, headers) => request('DELETE', url, null, headers),
   setAuthToken,
+  
+  getFullResponse: async (method, url, data = null, headers = {}) => {
+    const config = {
+      method,
+      headers: buildHeaders(headers),
+    };
+
+    if (data && method !== 'GET') {
+      config.body = JSON.stringify(data);
+    }
+
+    const fullUrl = `${API_BASE}${url}`;
+    const response = await fetch(fullUrl, config);
+    const responseBody = await response.json().catch(() => ({}));
+    
+    return {
+      success: response.ok && (responseBody.success !== false),
+      status: response.status,
+      data: responseBody.data || responseBody,
+      message: responseBody.message,
+      errors: responseBody.errors || [],
+      errorCode: responseBody.errorCode,
+      timestamp: responseBody.timestamp
+    };
+  }
 };
 
 export default BaseHttpClient;
