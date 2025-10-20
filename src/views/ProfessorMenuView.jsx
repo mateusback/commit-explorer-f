@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
 import { useMutation } from '@tanstack/react-query';
-import { UserPlus, ChefHat, Mail, Users, Shield, CheckCircle, AlertCircle } from 'lucide-react';
+import { UserPlus, Mail, Shield, CheckCircle, AlertCircle, GraduationCap } from 'lucide-react';
 import AuthService from '../services/AuthService';
 import { NotificationService } from '../services/NotificationService';
 import { useAuth } from '../components/auth/AuthContext';
@@ -57,22 +56,12 @@ export default function ProfessorMenuView() {
 
     return (
         <div className="max-w-4xl mx-auto px-4 py-8">
-            <div className="mb-8">
-                <div className="flex items-center gap-3 mb-2">
-                    <ChefHat className="h-6 w-6 text-emerald-600" />
-                    <h1 className="text-2xl font-bold text-gray-900">Menu do Professor</h1>
-                </div>
-                <p className="text-gray-600">
-                    Gerencie usuários e promova estudantes a professores
-                </p>
-            </div>
-
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
                 {/* Formulário para adicionar professor */}
                 <div className="bg-white rounded-lg shadow border">
                     <div className="px-6 py-4 border-b border-gray-200">
                         <div className="flex items-center gap-3">
-                            <UserPlus className="h-5 w-5 text-emerald-600" />
+                            <GraduationCap className="h-5 w-5 text-emerald-600" />
                             <h2 className="text-lg font-semibold text-gray-900">Promover a Professor</h2>
                         </div>
                     </div>
@@ -138,16 +127,6 @@ export default function ProfessorMenuView() {
                             <div className="flex items-start gap-3">
                                 <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
                                 <div>
-                                    <h3 className="font-medium text-gray-900">Gerenciar Usuários</h3>
-                                    <p className="text-sm text-gray-600">
-                                        Visualizar e editar roles de todos os usuários registrados
-                                    </p>
-                                </div>
-                            </div>
-                            
-                            <div className="flex items-start gap-3">
-                                <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                                <div>
                                     <h3 className="font-medium text-gray-900">Promover Professores</h3>
                                     <p className="text-sm text-gray-600">
                                         Adicionar novos professores ao sistema
@@ -179,33 +158,11 @@ export default function ProfessorMenuView() {
                             <p>• O usuário deve estar registrado no sistema antes de ser promovido a professor</p>
                             <p>• Professores têm acesso a todas as funcionalidades administrativas</p>
                             <p>• Esta ação não pode ser desfeita através desta interface</p>
-                            <p>• Para remover privilégios de professor, use a página de gerenciamento de usuários</p>
                         </div>
                     </div>
                 </div>
             </div>
 
-            {/* Links rápidos */}
-            <div className="mt-8 bg-gray-50 rounded-lg p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Links Úteis</h3>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <Link
-                        to="/roles"
-                        className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
-                    >
-                        <Users className="h-5 w-5 text-emerald-600" />
-                        <span className="font-medium text-gray-900">Gerenciar Usuários</span>
-                    </Link>
-                    
-                    <Link
-                        to="/dashboard"
-                        className="flex items-center gap-3 p-3 bg-white rounded-lg border border-gray-200 hover:border-emerald-300 hover:bg-emerald-50 transition-colors"
-                    >
-                        <Shield className="h-5 w-5 text-emerald-600" />
-                        <span className="font-medium text-gray-900">Dashboard</span>
-                    </Link>
-                </div>
-            </div>
         </div>
     );
 }

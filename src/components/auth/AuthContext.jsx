@@ -95,8 +95,44 @@ export function AuthProvider({ children }) {
     };
 
     const hasRole = (role) => {
-        if (!user || !user.roles) return false;
-        return user.roles.includes(role) || user.role === role;
+        console.log('[AUTH] hasRole verificando:', { role, user, hasRoles: !!user?.roles, hasRole: !!user?.role });
+        if (!user) {
+            console.log('[AUTH] hasRole: user não existe');
+            return false;
+        }
+        if (!user.roles && !user.role) {
+            console.log('[AUTH] hasRole: user não tem roles nem role');
+            return false;
+        }
+        
+        // Normalizar a role para lowercase
+        const normalizedRole = role.toLowerCase();
+        
+        // Verificar array de roles
+        if (user.roles && Array.isArray(user.roles)) {
+            const hasRoleInArray = user.roles.some(r => {
+                const normalizedUserRole = r.toLowerCase();
+                // Aceita tanto "professor" quanto "ROLE_PROFESSOR"
+                return normalizedUserRole === normalizedRole || 
+                       normalizedUserRole === `role_${normalizedRole}` ||
+                       normalizedUserRole.replace('role_', '') === normalizedRole;
+            });
+            console.log('[AUTH] hasRole resultado (array):', hasRoleInArray, 'roles:', user.roles);
+            if (hasRoleInArray) return true;
+        }
+        
+        // Verificar role única (string)
+        if (user.role) {
+            const normalizedUserRole = user.role.toLowerCase();
+            const result = normalizedUserRole === normalizedRole || 
+                          normalizedUserRole === `role_${normalizedRole}` ||
+                          normalizedUserRole.replace('role_', '') === normalizedRole;
+            console.log('[AUTH] hasRole resultado (string):', result);
+            return result;
+        }
+        
+        console.log('[AUTH] hasRole resultado final:', false);
+        return false;
     };
 
     const value = useMemo(() => {

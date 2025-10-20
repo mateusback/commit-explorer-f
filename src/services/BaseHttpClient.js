@@ -95,7 +95,7 @@ const BaseHttpClient = {
   post: (url, data, headers) => request('POST', url, data, headers),
   put: (url, data, headers) => request('PUT', url, data, headers),
   patch: (url, data, headers) => request('PATCH', url, data, headers),
-  del: (url, headers) => request('DELETE', url, null, headers),
+  delete: (url, headers) => request('DELETE', url, null, headers), // Alias para del
   setAuthToken,
   
   getFullResponse: async (method, url, data = null, headers = {}) => {

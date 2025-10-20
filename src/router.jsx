@@ -12,14 +12,11 @@ import AnalyzeView from './views/AnalyzeView';
 import StatusView from './views/StatusView';
 import ProjectsView from './views/ProjectsView';
 import ProjectDetailsView from './views/ProjectDetailsView';
-import CommitsView from './views/CommitsView';
 import CommitDetailsView from './views/CommitDetailsView';
 import MetricsView from './views/MetricsView';
-import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
 import AnalysisDetailsPage from './views/AnalysisDetailsPage';
 import AnalysisRedirect from './components/AnalysisRedirect';
-import RoleManagementView from './views/RoleManagementView';
 import ProfessorMenuView from './views/ProfessorMenuView';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
@@ -71,11 +68,6 @@ export const router = createBrowserRouter([
             handle: withMeta('Detalhes do Projeto', 'Métricas, atividades e recomendações por repositório.'),
           },
           {
-            path: '/commits',
-            element: <CommitsView />,
-            handle: withMeta('Registro de Todos os Commits', 'Uma lista cronológica de todos os commits de todos os projetos.'),
-          },
-          {
             path: '/commits/:id',
             element: <CommitDetailsView />,
             handle: withMeta('Detalhes do Commit', 'Mudanças, arquivos afetados e sugestões específicas.'),
@@ -84,11 +76,6 @@ export const router = createBrowserRouter([
             path: '/metrics',
             element: <MetricsView />,
             handle: withMeta('Análise de Métricas Globais', 'Detalhamento das métricas agregadas de todos os projetos.'),
-          },
-          {
-            path: '/suggestions',
-            element: <SuggestionsView />,
-            handle: withMeta('Feed de Sugestões Globais', 'Uma lista abrangente de todas as sugestões.'),
           },
           {
             path: '/settings',
@@ -102,16 +89,7 @@ export const router = createBrowserRouter([
                 <ProfessorMenuView />
               </RoleProtectedRoute>
             ),
-            handle: withMeta('Menu do Professor', 'Gerencie usuários e promova novos professores.'),
-          },
-          {
-            path: '/roles',
-            element: (
-              <RoleProtectedRoute requiredRole="professor">
-                <RoleManagementView />
-              </RoleProtectedRoute>
-            ),
-            handle: withMeta('Gerenciamento de Usuários', 'Gerencie funções e permissões dos usuários do sistema.'),
+            handle: withMeta('Menu do Professor', 'Promova usuários para professores.'),
           },
           {
             path: '/analise/:analysisId',

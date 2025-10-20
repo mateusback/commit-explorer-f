@@ -203,10 +203,10 @@ export default function ProjectDetailsView() {
             <p className="mt-1 text-stone-500">Quando uma análise for realizada, ela aparecerá aqui.</p>
           </div>
         ) : (
-          <ul className="space-y-8">
+          <ul className="space-y-12">
             {analises.map((a, idx) => (
               <Link key={a.id || idx} to={`/projeto/${idProjeto}/analises?analise=${a.id}`}>
-                <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
+                <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl mb-6">
                   <div className="p-6 flex flex-col lg:flex-row items-center gap-6">
                     <div className="flex-shrink-0 flex flex-col items-center">
                       <ScoreGauge score={a.pontuacaoTotal} />
