@@ -13,13 +13,15 @@ import {
   GitBranch,
   Menu,
   X,
-  Activity
+  Activity,
+  Users,
+  ChefHat
 } from 'lucide-react';
 
 const Sidebar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const location = useLocation();
-  const { logout } = useAuth();
+  const { logout, hasRole } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -91,6 +93,36 @@ const Sidebar = () => {
         </nav>
 
         <div className="mt-auto">
+          {hasRole('professor') && (
+            <>
+              <NavLink
+                to="/professor"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-4 py-3 text-stone-600 hover:bg-stone-100 hover:text-emerald-600 rounded-lg transition-colors duration-150 group ${
+                    isActive ? 'bg-stone-100 text-emerald-600 font-semibold' : ''
+                  }`
+                }
+              >
+                <ChefHat className={`w-5 h-5 text-stone-500 group-hover:text-emerald-600`} />
+                <span>Menu do Professor</span>
+              </NavLink>
+              
+              <NavLink
+                to="/roles"
+                onClick={() => setIsOpen(false)}
+                className={({ isActive }) =>
+                  `flex items-center space-x-3 px-4 py-3 text-stone-600 hover:bg-stone-100 hover:text-emerald-600 rounded-lg transition-colors duration-150 group ${
+                    isActive ? 'bg-stone-100 text-emerald-600 font-semibold' : ''
+                  }`
+                }
+              >
+                <Users className={`w-5 h-5 text-stone-500 group-hover:text-emerald-600`} />
+                <span>Gerenciar Usuários</span>
+              </NavLink>
+            </>
+          )}
+          
           <NavLink
             to="/settings"
             onClick={() => setIsOpen(false)}

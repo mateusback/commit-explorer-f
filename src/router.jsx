@@ -4,6 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import AuthLayout from './components/layout/AuthLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 
 import DashboardView from './views/DashboardView';
@@ -18,6 +19,8 @@ import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
 import AnalysisDetailsPage from './views/AnalysisDetailsPage';
 import AnalysisRedirect from './components/AnalysisRedirect';
+import RoleManagementView from './views/RoleManagementView';
+import ProfessorMenuView from './views/ProfessorMenuView';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 
@@ -91,6 +94,24 @@ export const router = createBrowserRouter([
             path: '/settings',
             element: <SettingsView />,
             handle: withMeta('Configurações da Aplicação', 'Configure o Commit Explorer, integrações e preferências.'),
+          },
+          {
+            path: '/professor',
+            element: (
+              <RoleProtectedRoute requiredRole="professor">
+                <ProfessorMenuView />
+              </RoleProtectedRoute>
+            ),
+            handle: withMeta('Menu do Professor', 'Gerencie usuários e promova novos professores.'),
+          },
+          {
+            path: '/roles',
+            element: (
+              <RoleProtectedRoute requiredRole="professor">
+                <RoleManagementView />
+              </RoleProtectedRoute>
+            ),
+            handle: withMeta('Gerenciamento de Usuários', 'Gerencie funções e permissões dos usuários do sistema.'),
           },
           {
             path: '/analise/:analysisId',

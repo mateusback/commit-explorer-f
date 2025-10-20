@@ -1,10 +1,12 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useParams, useSearchParams } from 'react-router-dom';
-import { useQuery } from '@tanstack/react-query';
+import { useParams, useSearchParams, useNavigate } from 'react-router-dom';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { Award, TrendingUp, Code, Users, Mail, User, GitBranch } from 'lucide-react';
-import { fetchAnalysisById } from '../services/AnalysisService';
+import { fetchAnalysisById, deleteAnalysisById } from '../services/AnalysisService';
 import { fetchProjectAnalyses } from '../services/ProjectService';
+import DeleteConfirmationModal from '../components/modals/DeleteConfirmationModal';
+import { NotificationService } from '../services/NotificationService';
 import StatSummaryCard from '../components/ui/StatSummaryCard';
 import CommitFrequencyChart from '../components/analysis/CommitFrequencyChart';
 import HourlyDistributionChart from '../components/analysis/HourlyDistributionChart';
@@ -79,10 +81,17 @@ AuthorInfoCard.propTypes = {
 export default function AnalysisDetailsPage() {
   const { analysisId, idProjeto } = useParams();
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const initialAnalysisId = searchParams.get('analise');
   
   const [activeAnalysisTab, setActiveAnalysisTab] = useState(initialAnalysisId || 'overview');
   const [activeAuthorTab, setActiveAuthorTab] = useState('geral');
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    analysisId: null,
+    analysisName: null
+  });
 
   // Se temos um analysisId, buscar análise específica (modo antigo)
   // Se temos um idProjeto, buscar todas as análises do projeto (modo novo)
@@ -148,6 +157,49 @@ export default function AnalysisDetailsPage() {
     }
     return singleAnalysisData || null;
   }, [isProjectMode, currentAnalysisData, singleAnalysisData]);
+
+  // Mutation para deletar análise
+  const deleteAnalysisMutation = useMutation({
+    mutationFn: deleteAnalysisById,
+    onSuccess: () => {
+      NotificationService.success('Análise excluída com sucesso!');
+      setDeleteModal({ isOpen: false, analysisId: null, analysisName: null });
+      
+      if (isProjectMode) {
+        // Invalidar cache e redirecionar para overview
+        queryClient.invalidateQueries({ queryKey: ['projectAnalyses', idProjeto] });
+        setActiveAnalysisTab('overview');
+      } else {
+        // Redirecionar para projetos
+        navigate('/projects');
+      }
+    },
+    onError: (error) => {
+      NotificationService.error(
+        error?.message || 'Erro ao excluir análise. Tente novamente.'
+      );
+    },
+  });
+
+  const handleDeleteAnalysis = () => {
+    if (currentAnalysisId) {
+      const currentAnalysis = isProjectMode 
+        ? availableAnalyses.find(a => a.idAnalise === currentAnalysisId)
+        : analysisData;
+      
+      setDeleteModal({
+        isOpen: true,
+        analysisId: currentAnalysisId,
+        analysisName: currentAnalysis?.geral?.nomeProjeto || 'Esta análise'
+      });
+    }
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModal.analysisId) {
+      deleteAnalysisMutation.mutate(deleteModal.analysisId);
+    }
+  };
 
   const displayedData = useMemo(() => {
     if (!analysisData) return null;
@@ -215,6 +267,9 @@ export default function AnalysisDetailsPage() {
               startDate={analysisData.geral?.dataInicio || 'Data de Início'}
               endDate={analysisData.geral?.dataFim || 'Data de Fim'}
               projectId={analysisData.geral?.idProjeto}
+              analysisId={currentAnalysisId}
+              onDeleteAnalysis={handleDeleteAnalysis}
+              showDeleteButton={!!currentAnalysisId}
             />
           </div>
         )}
@@ -308,6 +363,18 @@ export default function AnalysisDetailsPage() {
             )}
           </>
         )}
+        
+        {/* Delete Confirmation Modal */}
+        <DeleteConfirmationModal
+          isOpen={deleteModal.isOpen}
+          onClose={() => setDeleteModal({ isOpen: false, analysisId: null, analysisName: null })}
+          onConfirm={handleConfirmDelete}
+          title="Excluir Análise"
+          message="Tem certeza que deseja excluir esta análise? Todos os dados e métricas relacionados serão perdidos permanentemente."
+          itemName={deleteModal.analysisName}
+          isLoading={deleteAnalysisMutation.isPending}
+          confirmText="Excluir Análise"
+        />
       </div>
     </div>
   );

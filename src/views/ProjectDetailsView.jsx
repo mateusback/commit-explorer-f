@@ -132,7 +132,7 @@ export default function ProjectDetailsView() {
   const projectDisplayName = repoName || resumo.nomeProjeto || 'Projeto';
 
   return (
-    <div className="space-y-8 p-4 md:p-6">
+    <div className="space-y-10 p-4 md:p-6">
       <section>
         <h2 className="text-2xl font-bold text-stone-700 mb-4">
           {projectDisplayName}
@@ -140,7 +140,7 @@ export default function ProjectDetailsView() {
             <span className="block text-lg font-normal text-stone-600 mt-1">{resumo.nomeProjeto}</span>
           )}
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8">
           <ProgressSummaryCard
             icon={<Award />}
             title="Pontuação Média"
@@ -203,7 +203,7 @@ export default function ProjectDetailsView() {
             <p className="mt-1 text-stone-500">Quando uma análise for realizada, ela aparecerá aqui.</p>
           </div>
         ) : (
-          <ul className="space-y-6">
+          <ul className="space-y-8">
             {analises.map((a, idx) => (
               <Link key={a.id || idx} to={`/projeto/${idProjeto}/analises?analise=${a.id}`}>
                 <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
