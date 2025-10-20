@@ -17,6 +17,7 @@ import MetricsView from './views/MetricsView';
 import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
 import AnalysisDetailsPage from './views/AnalysisDetailsPage';
+import AnalysisRedirect from './components/AnalysisRedirect';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 
@@ -93,8 +94,13 @@ export const router = createBrowserRouter([
           },
           {
             path: '/analise/:analysisId',
+            element: <AnalysisRedirect />,
+            handle: withMeta('Carregando Análise', 'Redirecionando para visualização completa.'),
+          },
+          {
+            path: '/projeto/:idProjeto/analises',
             element: <AnalysisDetailsPage />,
-            handle: withMeta('Detalhes da Análise', 'Resultados completos da análise solicitada.'),
+            handle: withMeta('Análises do Projeto', 'Visualização completa de todas as análises do projeto.'),
           },
           { path: '*', element: <Navigate to="/dashboard" replace /> },
         ],

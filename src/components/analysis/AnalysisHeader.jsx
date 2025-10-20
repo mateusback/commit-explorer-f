@@ -1,7 +1,10 @@
 import React from 'react';
 import { ArrowLeft, Calendar, GitBranch, GitCommit } from 'lucide-react';
+import { extractRepoNameFromUrl } from '../../utils/RepoUtils';
 
 export default function AnalysisPageHeader({ projectName, repoUrl, branchName, startDate, endDate, projectId }) {
+  const repoName = extractRepoNameFromUrl(repoUrl);
+  
   return (
     <header className="bg-white p-6 rounded-xl shadow-sm ring-1 ring-stone-100">
       <div className="flex flex-col md:flex-row md:items-start md:justify-between">
@@ -11,8 +14,11 @@ export default function AnalysisPageHeader({ projectName, repoUrl, branchName, s
             Voltar para o Projeto
           </a>
           <h1 className="text-3xl font-bold text-stone-800">
-            {projectName || 'Análise do Projeto'}
+            {repoName || projectName || 'Análise do Projeto'}
           </h1>
+          {repoName && projectName && repoName !== projectName && (
+            <p className="text-lg text-stone-600 mt-1">{projectName}</p>
+          )}
         </div>
         <div className="flex items-center gap-2 text-sm text-stone-600 bg-stone-100 px-3 py-2 rounded-lg mt-4 md:mt-0">
           <Calendar size={16} className="text-stone-500" />

@@ -2,6 +2,7 @@ import React, { useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { fetchProjectAnalyses } from '../services/ProjectService';
+import { extractRepoNameFromUrl } from '../utils/RepoUtils';
 import {
   Loader2,
   TrendingUp,
@@ -124,10 +125,21 @@ export default function ProjectDetailsView() {
     autores = []
   } = resumo;
 
+  // Extrair nome do repositório da primeira análise
+  const firstAnalysis = analises[0];
+  const repoUrl = firstAnalysis?.urlRepositorio;
+  const repoName = extractRepoNameFromUrl(repoUrl);
+  const projectDisplayName = repoName || resumo.nomeProjeto || 'Projeto';
+
   return (
     <div className="space-y-8 p-4 md:p-6">
       <section>
-        <h2 className="text-2xl font-bold text-stone-700 mb-4">Resumo do Projeto</h2>
+        <h2 className="text-2xl font-bold text-stone-700 mb-4">
+          {projectDisplayName}
+          {repoName && resumo.nomeProjeto && repoName !== resumo.nomeProjeto && (
+            <span className="block text-lg font-normal text-stone-600 mt-1">{resumo.nomeProjeto}</span>
+          )}
+        </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
           <ProgressSummaryCard
             icon={<Award />}
@@ -173,7 +185,17 @@ export default function ProjectDetailsView() {
       </section>
 
       <section>
-        <h2 className="text-2xl font-bold text-stone-700 mb-4">Histórico de Análises</h2>
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-2xl font-bold text-stone-700">Histórico de Análises</h2>
+          {analises.length > 0 && (
+            <Link 
+              to={`/projeto/${idProjeto}/analises`}
+              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 transition-colors text-sm font-medium"
+            >
+              Ver Todas as Análises
+            </Link>
+          )}
+        </div>
         {analises.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-xl shadow-lg">
             <Puzzle size={48} className="mx-auto text-stone-300" />
@@ -183,8 +205,7 @@ export default function ProjectDetailsView() {
         ) : (
           <ul className="space-y-6">
             {analises.map((a, idx) => (
-              console.log(a),
-              <Link key={a.id || idx} to={`/analise/${a.id}`}>
+              <Link key={a.id || idx} to={`/projeto/${idProjeto}/analises?analise=${a.id}`}>
                 <li key={idx} className="bg-white rounded-xl shadow-lg overflow-hidden transition-all hover:shadow-2xl">
                   <div className="p-6 flex flex-col lg:flex-row items-center gap-6">
                     <div className="flex-shrink-0 flex flex-col items-center">

@@ -1,9 +1,10 @@
 import React, { useState, useMemo } from 'react';
 import PropTypes from 'prop-types';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { Award, TrendingUp, Code, Users, Mail, User, GitBranch } from 'lucide-react';
 import { fetchAnalysisById } from '../services/AnalysisService';
+import { fetchProjectAnalyses } from '../services/ProjectService';
 import StatSummaryCard from '../components/ui/StatSummaryCard';
 import CommitFrequencyChart from '../components/analysis/CommitFrequencyChart';
 import HourlyDistributionChart from '../components/analysis/HourlyDistributionChart';
@@ -13,10 +14,16 @@ import CommitsTable from '../components/analysis/CommitsTable';
 import EvaluationSection from '../components/analysis/EvaluationSection';
 import AnalysisHeader from '../components/analysis/AnalysisHeader';
 import AuthorTabs from '../components/ui/AuthorTabs';
+import AnalysisTabs from '../components/ui/AnalysisTabs';
+import AnalysisOverview from '../components/analysis/AnalysisOverview';
 import UserAvatar from '../components/UserAvatar';
 
 async function fetchAnalysisDetails(analysisId) {
   return fetchAnalysisById(analysisId);
+}
+
+async function fetchProjectAnalysesData(projectId) {
+  return fetchProjectAnalyses(projectId);
 }
 
 function AuthorInfoCard({ author }) {
@@ -70,34 +77,111 @@ AuthorInfoCard.propTypes = {
 };
 
 export default function AnalysisDetailsPage() {
-  const { analysisId } = useParams();
-  const [activeTab, setActiveTab] = useState('geral');
+  const { analysisId, idProjeto } = useParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialAnalysisId = searchParams.get('analise');
+  
+  const [activeAnalysisTab, setActiveAnalysisTab] = useState(initialAnalysisId || 'overview');
+  const [activeAuthorTab, setActiveAuthorTab] = useState('geral');
 
-  const { data, isLoading, error } = useQuery({
+  // Se temos um analysisId, buscar análise específica (modo antigo)
+  // Se temos um idProjeto, buscar todas as análises do projeto (modo novo)
+  const { data: singleAnalysisData, isLoading: isLoadingSingle, error: errorSingle } = useQuery({
     queryKey: ['analysisDetails', analysisId],
     queryFn: () => fetchAnalysisDetails(analysisId),
+    enabled: !!analysisId,
   });
 
-    const analysisData = data || null;
-    const displayedData = useMemo(() => {
-      if (!analysisData) return null;
-      if (activeTab === 'geral') return analysisData.geral;
-      
-      const autorData = analysisData.autores?.find(autor => String(autor.idAutor) === activeTab);
-      return autorData || null;
-    }, [analysisData, activeTab]);
+  const { data: projectData, isLoading: isLoadingProject, error: errorProject } = useQuery({
+    queryKey: ['projectAnalyses', idProjeto],
+    queryFn: () => fetchProjectAnalysesData(idProjeto),
+    enabled: !!idProjeto,
+  });
 
-  if (isLoading) {
+  // Determinar qual dados usar e modo de operação
+  const isProjectMode = !!idProjeto;
+  const isLoading = isProjectMode ? isLoadingProject : isLoadingSingle;
+  const error = isProjectMode ? errorProject : errorSingle;
+
+  // Dados das análises disponíveis
+  const availableAnalyses = useMemo(() => {
+    if (isProjectMode && projectData) {
+      return projectData.analises || [];
+    }
+    return [];
+  }, [isProjectMode, projectData]);
+
+  // Função para alterar análise e atualizar URL
+  const handleAnalysisChange = (analysisId) => {
+    setActiveAnalysisTab(analysisId);
+    if (analysisId === 'overview') {
+      // Remover parâmetro de análise da URL
+      searchParams.delete('analise');
+      setSearchParams(searchParams, { replace: true });
+    } else {
+      // Adicionar/atualizar parâmetro de análise na URL
+      searchParams.set('analise', analysisId);
+      setSearchParams(searchParams, { replace: true });
+    }
+    // Reset author tab when switching analysis
+    setActiveAuthorTab('geral');
+  };
+
+  // Dados da análise atualmente selecionada
+  const currentAnalysisId = useMemo(() => {
+    if (!isProjectMode) return analysisId;
+    if (activeAnalysisTab === 'overview') return null;
+    return activeAnalysisTab;
+  }, [isProjectMode, analysisId, activeAnalysisTab]);
+
+  // Buscar dados detalhados da análise selecionada (só quando necessário)
+  const { data: currentAnalysisData, isLoading: isLoadingCurrent } = useQuery({
+    queryKey: ['analysisDetails', currentAnalysisId],
+    queryFn: () => fetchAnalysisDetails(currentAnalysisId),
+    enabled: !!currentAnalysisId,
+  });
+
+  // Dados finais para exibição
+  const analysisData = useMemo(() => {
+    if (isProjectMode) {
+      return currentAnalysisData || null;
+    }
+    return singleAnalysisData || null;
+  }, [isProjectMode, currentAnalysisData, singleAnalysisData]);
+
+  const displayedData = useMemo(() => {
+    if (!analysisData) return null;
+    if (activeAuthorTab === 'geral') return analysisData.geral;
+    
+    const autorData = analysisData.autores?.find(autor => String(autor.idAutor) === activeAuthorTab);
+    return autorData || null;
+  }, [analysisData, activeAuthorTab]);
+
+  if (isLoading || (isProjectMode && isLoadingCurrent && activeAnalysisTab !== 'overview')) {
     return <div className="flex justify-center items-center h-screen">
       <span className="loading loading-spinner loading-lg"></span>
     </div>;
   }
 
-    if (error || !analysisData) {
-      return <div className="text-center text-red-500 p-8">
-        Erro ao carregar a análise: {error?.message || 'Dados não encontrados.'}
-      </div>;
-    }
+  if (error) {
+    return <div className="text-center text-red-500 p-8">
+      Erro ao carregar os dados: {error?.message || 'Dados não encontrados.'}
+    </div>;
+  }
+
+  // Se estamos no modo projeto mas não temos análises
+  if (isProjectMode && (!availableAnalyses || availableAnalyses.length === 0)) {
+    return <div className="text-center text-stone-500 p-8">
+      Nenhuma análise encontrada para este projeto.
+    </div>;
+  }
+
+  // Se estamos no modo análise única mas não temos dados
+  if (!isProjectMode && !analysisData) {
+    return <div className="text-center text-red-500 p-8">
+      Análise não encontrada.
+    </div>;
+  }
 
     const { 
       feedback,
@@ -109,83 +193,120 @@ export default function AnalysisDetailsPage() {
       charts 
     } = displayedData || {};
 
+  const projectName = isProjectMode 
+    ? (projectData?.analises?.[0]?.nomeProjeto || 'Projeto')
+    : (analysisData?.geral?.nomeProjeto || 'Projeto Não Identificado');
+
+  const repoUrl = isProjectMode
+    ? (projectData?.analises?.[0]?.urlRepositorio)
+    : (analysisData?.geral?.urlRepositorio);
+
   return (
     <div className="p-4 md:p-8 bg-base-200 min-h-screen">
       <div className="max-w-7xl mx-auto">
 
-        {/* Cabeçalho */}
-        <div className="mb-8">
+        {/* Cabeçalho - só mostrar quando temos dados específicos */}
+        {analysisData && (
+          <div className="mb-8">
             <AnalysisHeader
-              projectName={analysisData.geral?.nomeProjeto || 'Projeto Não Identificado'}
+              projectName={analysisData.geral?.nomeProjeto || projectName}
               repoUrl={analysisData.geral?.urlRepositorio || 'Url do Repositório'}
               branchName={analysisData.geral?.branch || 'Branch Não Identificada'}
               startDate={analysisData.geral?.dataInicio || 'Data de Início'}
               endDate={analysisData.geral?.dataFim || 'Data de Fim'}
               projectId={analysisData.geral?.idProjeto}
             />
-        </div>
+          </div>
+        )}
 
-        {/* Tabs para seleção */}
-          <AuthorTabs
-            value={activeTab}
-            onChange={setActiveTab}
-            autores={analysisData.autores}
-            geral={{
-              totalCommits: analysisData.geral?.totalCommits,
-              quantidadeCodeSmells: analysisData.geral?.quantidadeCodeSmells,
-              pontuacaoTotal: analysisData.geral?.pontuacaoTotal,
-            }}
+        {/* Tabs de análises (só no modo projeto) */}
+        {isProjectMode && (
+          <AnalysisTabs
+            value={activeAnalysisTab}
+            onChange={handleAnalysisChange}
+            analises={availableAnalyses}
+            showOverview={true}
           />
+        )}
 
-        {/* Conteúdo da aba */}
-        {displayedData ? (
+        {/* Conteúdo baseado na seleção */}
+        {isProjectMode && activeAnalysisTab === 'overview' ? (
+          <AnalysisOverview 
+            analises={availableAnalyses.map(analise => ({
+              ...analise,
+              urlRepositorio: repoUrl || analise.urlRepositorio
+            }))} 
+            projectName={projectName} 
+          />
+        ) : (
           <>
-            {/* Card com informações do autor (apenas quando não for aba geral) */}
-            {activeTab !== 'geral' && (
-              <AuthorInfoCard 
-                author={analysisData.autores?.find(autor => String(autor.idAutor) === activeTab)} 
+            {/* Tabs de autores (só quando temos dados de análise específica) */}
+            {analysisData && (
+              <AuthorTabs
+                value={activeAuthorTab}
+                onChange={setActiveAuthorTab}
+                autores={analysisData.autores}
+                geral={{
+                  totalCommits: analysisData.geral?.totalCommits,
+                  quantidadeCodeSmells: analysisData.geral?.quantidadeCodeSmells,
+                  pontuacaoTotal: analysisData.geral?.pontuacaoTotal,
+                }}
               />
             )}
 
-            {/* Cards de estatísticas */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
-              <StatSummaryCard title="Pontuação" value={pontuacaoTotal?.toFixed(1) ?? 'N/A'} icon={<Award />} color={pontuacaoTotal > 75 ? 'emerald' : 'amber'} />
-              <StatSummaryCard title="Total de Commits" value={totalCommits ?? 0} icon={<TrendingUp />} color='sky' />
-              <StatSummaryCard title="Code Smells" value={quantidadeCodeSmells ?? 0} icon={<Code />} color='amber' />
-              <StatSummaryCard title="Complexidade Média" value={complexidadeMedia?.toFixed(1) ?? 0} icon={<Users />} color='violet' />
-            </div>
+            {/* Conteúdo da aba de autor */}
+            {displayedData ? (
+              <>
+                {/* Card com informações do autor (apenas quando não for aba geral) */}
+                {activeAuthorTab !== 'geral' && analysisData && (
+                  <AuthorInfoCard 
+                    author={analysisData.autores?.find(autor => String(autor.idAutor) === activeAuthorTab)} 
+                  />
+                )}
 
-            {/* Gráficos - agora direto dos objetos */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
-              <CommitFrequencyChart data={charts?.frequenciaCommits} />
-              <HourlyDistributionChart data={charts?.distribuicaoHorarios} />
-              <TopFilesChart data={charts?.topArquivos} />
-              <CommitTypesChart data={charts?.tipoCommits} />
-            </div>
+                {/* Cards de estatísticas */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 my-8">
+                  <StatSummaryCard title="Pontuação" value={displayedData.pontuacaoTotal?.toFixed(1) ?? 'N/A'} icon={<Award />} color={displayedData.pontuacaoTotal > 75 ? 'emerald' : 'amber'} />
+                  <StatSummaryCard title="Total de Commits" value={displayedData.totalCommits ?? 0} icon={<TrendingUp />} color='sky' />
+                  <StatSummaryCard title="Code Smells" value={displayedData.quantidadeCodeSmells ?? 0} icon={<Code />} color='amber' />
+                  <StatSummaryCard title="Complexidade Média" value={displayedData.complexidadeMedia?.toFixed(1) ?? 0} icon={<Users />} color='violet' />
+                </div>
 
-            {/* Tabela de commits */}
-            {commits ? (
-              <CommitsTable commits={commits} />
+                {/* Gráficos */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 my-8">
+                  <CommitFrequencyChart data={displayedData.charts?.frequenciaCommits} />
+                  <HourlyDistributionChart data={displayedData.charts?.distribuicaoHorarios} />
+                  <TopFilesChart data={displayedData.charts?.topArquivos} />
+                  <CommitTypesChart data={displayedData.charts?.tipoCommits} />
+                </div>
+
+                {/* Tabela de commits */}
+                {displayedData.commits ? (
+                  <CommitsTable commits={displayedData.commits} />
+                ) : (
+                  <p className="text-center text-stone-500">Não há commits para esta seleção.</p>
+                )}
+
+                {/* Avaliação */}
+                {(activeAuthorTab === 'geral' && analysisData?.feedback) && (
+                  <EvaluationSection
+                    score={analysisData.geral?.pontuacaoTotal}
+                    feedbackData={analysisData.feedback}
+                  />
+                )}
+                {(activeAuthorTab !== 'geral' && displayedData?.feedback) && (
+                  <EvaluationSection
+                    score={displayedData?.pontuacaoGeral || displayedData.pontuacaoTotal}
+                    feedbackData={displayedData.feedback}
+                  />
+                )}
+              </>
             ) : (
-              <p className="text-center text-stone-500">Não há commits para esta seleção.</p>
-            )}
-
-            {/* Avaliação: mostra na aba geral e para cada autor se houver feedback */}
-            {(activeTab === 'geral' && analysisData?.feedback) && (
-              <EvaluationSection
-                score={analysisData.geral?.pontuacaoTotal}
-                feedbackData={analysisData.feedback}
-              />
-            )}
-            {(activeTab !== 'geral' && displayedData?.feedback) && (
-              <EvaluationSection
-                score={displayedData?.pontuacaoGeral || pontuacaoTotal}
-                feedbackData={displayedData.feedback}
-              />
+              <div className="text-center py-10">
+                {isProjectMode && activeAnalysisTab !== 'overview' ? 'Carregando análise selecionada...' : 'Selecione uma análise para visualizar os detalhes.'}
+              </div>
             )}
           </>
-        ) : (
-          <div className="text-center py-10">Carregando dados da aba...</div>
         )}
       </div>
     </div>
