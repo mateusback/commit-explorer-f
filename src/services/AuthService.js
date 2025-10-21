@@ -11,6 +11,16 @@ const AuthService = {
     const response = await BaseHttpClient.post(APIRoutes.AUTH_REGISTER, payload);
     return response;
   },
+
+  async getCurrentUser() {
+    const response = await BaseHttpClient.get(APIRoutes.USER_PROFILE);
+    return response;
+  },
+
+  async promoteToProfessor(email) {
+    const response = await BaseHttpClient.post(APIRoutes.PROMOTE_PROFESSOR, { email });
+    return response;
+  },
 };
 
 export default AuthService;
