@@ -3,6 +3,7 @@ const projectsRoute = '/api/v1/projects';
 const commitRoute = '/api/v1/commits';
 const analysisRoute = '/api/v1/analysis';
 const authRoute = '/auth';
+const dashboardRoute = '/api/v1/dashboard';
 
 const APIRoutes = {
   ANALYZE_REPOSITORIES: `${gitRoute}/analyze`,
@@ -18,6 +19,7 @@ const APIRoutes = {
   AUTH_REGISTER: `${authRoute}/signup`,
   USER_PROFILE: `${authRoute}/me`,
   PROMOTE_PROFESSOR: `${authRoute}/professors`,
+  DASHBOARD: dashboardRoute,
 };
 
 export default APIRoutes;
