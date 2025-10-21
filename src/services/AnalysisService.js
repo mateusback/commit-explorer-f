@@ -14,3 +14,7 @@ export function analyzeRepositories(payload) {
 export function fetchAnalysisById(id) {
   return BaseHttpClient.get(APIRoutes.GET_ANALYSIS_BY_ID(id));
 }
+
+export function deleteAnalysisById(id) {
+  return BaseHttpClient.delete(APIRoutes.DELETE_ANALYSIS_BY_ID(id));
+}

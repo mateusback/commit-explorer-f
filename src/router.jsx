@@ -4,6 +4,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import AppLayout from './components/layout/AppLayout';
 import AuthLayout from './components/layout/AuthLayout';
 import ProtectedRoute from './components/auth/ProtectedRoute';
+import RoleProtectedRoute from './components/auth/RoleProtectedRoute';
 import { AuthProvider } from './components/auth/AuthContext';
 
 import DashboardView from './views/DashboardView';
@@ -11,13 +12,12 @@ import AnalyzeView from './views/AnalyzeView';
 import StatusView from './views/StatusView';
 import ProjectsView from './views/ProjectsView';
 import ProjectDetailsView from './views/ProjectDetailsView';
-import CommitsView from './views/CommitsView';
 import CommitDetailsView from './views/CommitDetailsView';
 import MetricsView from './views/MetricsView';
-import SuggestionsView from './views/SuggestionsView';
 import SettingsView from './views/SettingsView';
 import AnalysisDetailsPage from './views/AnalysisDetailsPage';
 import AnalysisRedirect from './components/AnalysisRedirect';
+import ProfessorMenuView from './views/ProfessorMenuView';
 import LoginView from './views/LoginView';
 import RegisterView from './views/RegisterView';
 
@@ -68,11 +68,6 @@ export const router = createBrowserRouter([
             handle: withMeta('Detalhes do Projeto', 'Métricas, atividades e recomendações por repositório.'),
           },
           {
-            path: '/commits',
-            element: <CommitsView />,
-            handle: withMeta('Registro de Todos os Commits', 'Uma lista cronológica de todos os commits de todos os projetos.'),
-          },
-          {
             path: '/commits/:id',
             element: <CommitDetailsView />,
             handle: withMeta('Detalhes do Commit', 'Mudanças, arquivos afetados e sugestões específicas.'),
@@ -83,14 +78,18 @@ export const router = createBrowserRouter([
             handle: withMeta('Análise de Métricas Globais', 'Detalhamento das métricas agregadas de todos os projetos.'),
           },
           {
-            path: '/suggestions',
-            element: <SuggestionsView />,
-            handle: withMeta('Feed de Sugestões Globais', 'Uma lista abrangente de todas as sugestões.'),
-          },
-          {
             path: '/settings',
             element: <SettingsView />,
             handle: withMeta('Configurações da Aplicação', 'Configure o Commit Explorer, integrações e preferências.'),
+          },
+          {
+            path: '/professor',
+            element: (
+              <RoleProtectedRoute requiredRole="professor">
+                <ProfessorMenuView />
+              </RoleProtectedRoute>
+            ),
+            handle: withMeta('Menu do Professor', 'Promova usuários para professores.'),
           },
           {
             path: '/analise/:analysisId',

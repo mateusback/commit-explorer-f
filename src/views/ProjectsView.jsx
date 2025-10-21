@@ -1,14 +1,22 @@
-import React from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { fetchProjects } from '../services/ProjectService';
-import { Loader2, FolderGit2, Plus, SearchCode, GitBranch } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { fetchProjects, deleteProjectById } from '../services/ProjectService';
+import { Loader2, FolderGit2, Plus, SearchCode, GitBranch, Trash2, MoreVertical } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import { TimeConstants } from '../constants/TimeConstants';
 import { Link, useNavigate } from 'react-router-dom';
+import DeleteConfirmationModal from '../components/modals/DeleteConfirmationModal';
+import { NotificationService } from '../services/NotificationService';
 
 export default function ProjectsView() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+  const [deleteModal, setDeleteModal] = useState({
+    isOpen: false,
+    project: null
+  });
+  const [openDropdown, setOpenDropdown] = useState(null);
   
   const {
     data: projects,
@@ -21,6 +29,54 @@ export default function ProjectsView() {
     staleTime: TimeConstants.TEN_MINUTES,
     refetchOnWindowFocus: false,
   });
+
+  const deleteProjectMutation = useMutation({
+    mutationFn: deleteProjectById,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['projectsList'] });
+      NotificationService.success('Projeto excluído com sucesso!');
+      setDeleteModal({ isOpen: false, project: null });
+    },
+    onError: (error) => {
+      NotificationService.error(
+        error?.message || 'Erro ao excluir projeto. Tente novamente.'
+      );
+    },
+  });
+
+  const handleDeleteClick = (e, project) => {
+    e.stopPropagation();
+    setOpenDropdown(null);
+    setDeleteModal({ isOpen: true, project });
+  };
+
+  const handleConfirmDelete = () => {
+    if (deleteModal.project) {
+      deleteProjectMutation.mutate(deleteModal.project.idProjeto);
+    }
+  };
+
+  const handleDropdownClick = (e, projectId) => {
+    e.stopPropagation();
+    setOpenDropdown(openDropdown === projectId ? null : projectId);
+  };
+
+  const handleProjectClick = (projectId) => {
+    setOpenDropdown(null);
+    navigate(`/projects/${projectId}`);
+  };
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = () => {
+      setOpenDropdown(null);
+    };
+
+    if (openDropdown) {
+      document.addEventListener('click', handleClickOutside);
+      return () => document.removeEventListener('click', handleClickOutside);
+    }
+  }, [openDropdown]);
 
   if (isLoading) {
     return (
@@ -136,8 +192,8 @@ export default function ProjectsView() {
         {projects.map((proj) => (
           <div
             key={proj.idProjeto}
-            className="group p-4 border-2 border-stone-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50/50 cursor-pointer transition-all duration-200"
-            onClick={() => navigate(`/projects/${proj.idProjeto}`)}
+            className="group p-4 border-2 border-stone-200 rounded-xl hover:border-emerald-300 hover:bg-emerald-50/50 cursor-pointer transition-all duration-200 relative"
+            onClick={() => handleProjectClick(proj.idProjeto)}
           >
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-emerald-100 group-hover:bg-emerald-200 rounded-lg flex items-center justify-center transition-colors">
@@ -154,6 +210,29 @@ export default function ProjectsView() {
                   })}
                 </p>
               </div>
+              
+              {/* Dropdown Menu */}
+              <div className="relative">
+                <button
+                  onClick={(e) => handleDropdownClick(e, proj.idProjeto)}
+                  className="p-2 text-stone-400 hover:text-stone-600 rounded-lg hover:bg-white/60 transition-colors opacity-0 group-hover:opacity-100"
+                >
+                  <MoreVertical className="w-4 h-4" />
+                </button>
+                
+                {openDropdown === proj.idProjeto && (
+                  <div className="absolute right-0 top-full mt-1 bg-white border border-stone-200 rounded-lg shadow-lg z-10 min-w-[140px]">
+                    <button
+                      onClick={(e) => handleDeleteClick(e, proj)}
+                      className="w-full px-3 py-2 text-left text-sm text-red-600 hover:bg-red-50 flex items-center gap-2 first:rounded-t-lg last:rounded-b-lg transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                      Excluir
+                    </button>
+                  </div>
+                )}
+              </div>
+              
               <div className="opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="w-6 h-6 text-emerald-600">
                   →
@@ -163,6 +242,18 @@ export default function ProjectsView() {
           </div>
         ))}
       </div>
+      
+      {/* Delete Confirmation Modal */}
+      <DeleteConfirmationModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, project: null })}
+        onConfirm={handleConfirmDelete}
+        title="Excluir Projeto"
+        message="Tem certeza que deseja excluir este projeto? Todas as análises relacionadas também serão removidas."
+        itemName={deleteModal.project?.nome}
+        isLoading={deleteProjectMutation.isPending}
+        confirmText="Excluir Projeto"
+      />
     </section>
   );
 }
